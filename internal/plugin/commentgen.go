@@ -16,18 +16,20 @@ type commentGenerator struct {
 func (c commentGenerator) generateLeading(f *codegen.File, indent int) {
 	loc := c.descriptor.ParentFile().SourceLocations().ByDescriptor(c.descriptor)
 	lines := strings.Split(loc.LeadingComments, "\n")
+	f.P(t(indent), "/**")
 	for _, line := range lines {
 		if line == "" {
 			continue
 		}
-		f.P(t(indent), "// ", strings.TrimSpace(line))
+		f.P(t(indent), " * ", strings.TrimSpace(line))
 	}
 	if field, ok := c.descriptor.(protoreflect.FieldDescriptor); ok {
 		if behaviorComment := fieldBehaviorComment(field); len(behaviorComment) > 0 {
-			f.P(t(indent), "//")
-			f.P(t(indent), "// ", behaviorComment)
+			f.P(t(indent), " * ")
+			f.P(t(indent), " * ", behaviorComment)
 		}
 	}
+	f.P(t(indent), " */")
 }
 
 func fieldBehaviorComment(field protoreflect.FieldDescriptor) string {
