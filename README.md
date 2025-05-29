@@ -17,7 +17,7 @@ look at [examples](./examples).
 ### Install the plugin
 
 ```bash
-go get go.einride.tech/protoc-gen-typescript-http
+go install github.com/evad1n/protoc-gen-typescript-http
 ```
 
 Or download a prebuilt binary from [releases](./releases).
@@ -25,7 +25,7 @@ Or download a prebuilt binary from [releases](./releases).
 ### Invocation
 
 ```bash
-protoc 
+protoc
   --typescript-http_out [OUTPUT DIR] \
   [.proto files ...]
 ```

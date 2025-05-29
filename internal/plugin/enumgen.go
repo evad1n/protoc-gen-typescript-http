@@ -3,7 +3,7 @@ package plugin
 import (
 	"strconv"
 
-	"go.einride.tech/protoc-gen-typescript-http/internal/codegen"
+	"github.com/evad1n/protoc-gen-typescript-http/internal/codegen"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 

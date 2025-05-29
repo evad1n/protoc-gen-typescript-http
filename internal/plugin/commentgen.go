@@ -3,7 +3,7 @@ package plugin
 import (
 	"strings"
 
-	"go.einride.tech/protoc-gen-typescript-http/internal/codegen"
+	"github.com/evad1n/protoc-gen-typescript-http/internal/codegen"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
