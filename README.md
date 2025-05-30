@@ -20,8 +20,6 @@ look at [examples](./examples).
 go install github.com/evad1n/protoc-gen-typescript-http
 ```
 
-Or download a prebuilt binary from [releases](./releases).
-
 ### Invocation
 
 ```bash
@@ -29,6 +27,24 @@ protoc
   --typescript-http_out [OUTPUT DIR] \
   [.proto files ...]
 ```
+
+### With `buf` and `buf.gen.yaml`
+
+> https://buf.build/docs/configuration/v2/buf-gen-yaml/
+
+```yml
+plugins:
+  - local: protoc-gen-typescript-http
+    out: src/gen
+    opt:
+      - jsdoc=true
+```
+
+### Options
+
+- `verbose` - print some extra information when running
+- `jsdoc` - Use JSDOC comments
+
 
 ______________________________________________________________________
 
