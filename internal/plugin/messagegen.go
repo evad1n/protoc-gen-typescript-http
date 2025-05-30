@@ -16,7 +16,7 @@ type messageGenerator struct {
 func (m messageGenerator) Generate(f *codegen.File) {
 	commentGenerator{descriptor: m.message}.generateLeading(f, 0)
 
-	f.Print("export type ", scopedDescriptorTypeName(m.pkg, m.message), " = {")
+	f.Write("export type ", scopedDescriptorTypeName(m.pkg, m.message), " = {")
 
 	rangeFields(m.message, func(field protoreflect.FieldDescriptor) {
 		commentGenerator{descriptor: field}.generateLeading(f, 1)
@@ -25,16 +25,16 @@ func (m messageGenerator) Generate(f *codegen.File) {
 		behaviors := getFieldBehaviors(field)
 
 		if slices.Contains(behaviors, annotations.FieldBehavior_OPTIONAL) {
-			f.Print(indentBy(1), field.JSONName(), "?: ", fieldType.Reference(), ";")
+			f.Write(indentBy(1), field.JSONName(), "?: ", fieldType.Reference(), ";")
 		} else if slices.Contains(behaviors, annotations.FieldBehavior_REQUIRED) {
-			f.Print(indentBy(1), field.JSONName(), ": ", fieldType.Reference(), ";")
+			f.Write(indentBy(1), field.JSONName(), ": ", fieldType.Reference(), ";")
 		} else if field.ContainingOneof() == nil && !field.HasOptionalKeyword() {
-			f.Print(indentBy(1), field.JSONName(), ": ", fieldType.Reference(), ";")
+			f.Write(indentBy(1), field.JSONName(), ": ", fieldType.Reference(), ";")
 		} else {
-			f.Print(indentBy(1), field.JSONName(), "?: ", fieldType.Reference(), ";")
+			f.Write(indentBy(1), field.JSONName(), "?: ", fieldType.Reference(), ";")
 		}
 	})
 
-	f.Print("};")
-	f.Print()
+	f.Write("};")
+	f.Write()
 }

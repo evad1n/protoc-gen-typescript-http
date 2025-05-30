@@ -18,31 +18,31 @@ func (c commentGenerator) generateLeading(f *codegen.File, indent int) {
 	lines := strings.Split(loc.LeadingComments, "\n")
 
 	if options.jsdoc {
-		f.Print(indentBy(indent), "/**")
+		f.Write(indentBy(indent), "/**")
 		for _, line := range lines {
 			if line == "" {
 				continue
 			}
-			f.Print(indentBy(indent), " * ", strings.TrimSpace(line))
+			f.Write(indentBy(indent), " * ", strings.TrimSpace(line))
 		}
 		if field, ok := c.descriptor.(protoreflect.FieldDescriptor); ok {
 			if behaviorComment := fieldBehaviorComment(field); len(behaviorComment) > 0 {
-				f.Print(indentBy(indent), " * ")
-				f.Print(indentBy(indent), " * ", behaviorComment)
+				f.Write(indentBy(indent), " * ")
+				f.Write(indentBy(indent), " * ", behaviorComment)
 			}
 		}
-		f.Print(indentBy(indent), " */")
+		f.Write(indentBy(indent), " */")
 	} else {
 		for _, line := range lines {
 			if line == "" {
 				continue
 			}
-			f.Print(indentBy(indent), "// ", strings.TrimSpace(line))
+			f.Write(indentBy(indent), "// ", strings.TrimSpace(line))
 		}
 		if field, ok := c.descriptor.(protoreflect.FieldDescriptor); ok {
 			if behaviorComment := fieldBehaviorComment(field); len(behaviorComment) > 0 {
-				f.Print(indentBy(indent), "//")
-				f.Print(indentBy(indent), "// ", behaviorComment)
+				f.Write(indentBy(indent), "//")
+				f.Write(indentBy(indent), "// ", behaviorComment)
 			}
 		}
 	}

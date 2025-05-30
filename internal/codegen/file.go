@@ -9,7 +9,7 @@ type File struct {
 	buf bytes.Buffer
 }
 
-func (f *File) Print(v ...interface{}) {
+func (f *File) Write(v ...interface{}) {
 	for _, x := range v {
 		fmt.Fprint(&f.buf, x)
 	}

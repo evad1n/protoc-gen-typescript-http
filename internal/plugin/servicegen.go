@@ -26,7 +26,7 @@ func (s serviceGenerator) Generate(f *codegen.File) error {
 
 func (s serviceGenerator) generateInterface(f *codegen.File) {
 	commentGenerator{descriptor: s.service}.generateLeading(f, 0)
-	f.Print("export interface ", descriptorTypeName(s.service), " {")
+	f.Write("export interface ", descriptorTypeName(s.service), " {")
 	rangeMethods(s.service.Methods(), func(method protoreflect.MethodDescriptor) {
 		if !supportedMethod(method) {
 			return
@@ -34,25 +34,25 @@ func (s serviceGenerator) generateInterface(f *codegen.File) {
 		commentGenerator{descriptor: method}.generateLeading(f, 1)
 		input := typeFromMessage(s.pkg, method.Input())
 		output := typeFromMessage(s.pkg, method.Output())
-		f.Print(indentBy(1), method.Name(), "(request: ", input.Reference(), "): Promise<", output.Reference(), ">;")
+		f.Write(indentBy(1), method.Name(), "(request: ", input.Reference(), "): Promise<", output.Reference(), ">;")
 	})
-	f.Print("}")
-	f.Print()
+	f.Write("}")
+	f.Write()
 }
 
 func (s serviceGenerator) generateHandler(f *codegen.File) {
-	f.Print("type RequestType = {")
-	f.Print(indentBy(1), "path: string;")
-	f.Print(indentBy(1), "method: string;")
-	f.Print(indentBy(1), "body: string | null;")
-	f.Print("};")
-	f.Print()
-	f.Print("type RequestHandler = (request: RequestType, meta: { service: string, method: string }) => Promise<unknown>;")
-	f.Print()
+	f.Write("type RequestType = {")
+	f.Write(indentBy(1), "path: string;")
+	f.Write(indentBy(1), "method: string;")
+	f.Write(indentBy(1), "body: string | null;")
+	f.Write("};")
+	f.Write()
+	f.Write("type RequestHandler = (request: RequestType, meta: { service: string, method: string }) => Promise<unknown>;")
+	f.Write()
 }
 
 func (s serviceGenerator) generateClient(f *codegen.File) error {
-	f.Print(
+	f.Write(
 		"export function create",
 		descriptorTypeName(s.service),
 		"Client(",
@@ -64,7 +64,7 @@ func (s serviceGenerator) generateClient(f *codegen.File) error {
 		descriptorTypeName(s.service),
 		" {",
 	)
-	f.Print(indentBy(1), "return {")
+	f.Write(indentBy(1), "return {")
 	var methodErr error
 	rangeMethods(s.service.Methods(), func(method protoreflect.MethodDescriptor) {
 		if err := s.generateMethod(f, method); err != nil {
@@ -74,8 +74,8 @@ func (s serviceGenerator) generateClient(f *codegen.File) error {
 	if methodErr != nil {
 		return methodErr
 	}
-	f.Print(indentBy(1), "};")
-	f.Print("}")
+	f.Write(indentBy(1), "};")
+	f.Write("}")
 	return nil
 }
 
@@ -89,24 +89,24 @@ func (s serviceGenerator) generateMethod(f *codegen.File, method protoreflect.Me
 	if err != nil {
 		return fmt.Errorf("parse http rule: %w", err)
 	}
-	f.Print(indentBy(2), method.Name(), "(request) { // eslint-disable-line @typescript-eslint/no-unused-vars")
+	f.Write(indentBy(2), method.Name(), "(request) { // eslint-disable-line @typescript-eslint/no-unused-vars")
 	s.generateMethodPathValidation(f, method.Input(), rule)
 	s.generateMethodPath(f, method.Input(), rule)
 	s.generateMethodBody(f, method.Input(), rule)
 	s.generateMethodQuery(f, method.Input(), rule)
-	f.Print(indentBy(3), "let uri = path;")
-	f.Print(indentBy(3), "if (queryParams.length > 0) {")
-	f.Print(indentBy(4), "uri += `?${queryParams.join(\"&\")}`")
-	f.Print(indentBy(3), "}")
-	f.Print(indentBy(3), "return handler({")
-	f.Print(indentBy(4), "path: uri,")
-	f.Print(indentBy(4), "method: ", strconv.Quote(rule.Method), ",")
-	f.Print(indentBy(4), "body,")
-	f.Print(indentBy(3), "}, {")
-	f.Print(indentBy(4), "service: \"", method.Parent().Name(), "\",")
-	f.Print(indentBy(4), "method: \"", method.Name(), "\",")
-	f.Print(indentBy(3), "}) as Promise<", outputType.Reference(), ">;")
-	f.Print(indentBy(2), "},")
+	f.Write(indentBy(3), "let uri = path;")
+	f.Write(indentBy(3), "if (queryParams.length > 0) {")
+	f.Write(indentBy(4), "uri += `?${queryParams.join(\"&\")}`")
+	f.Write(indentBy(3), "}")
+	f.Write(indentBy(3), "return handler({")
+	f.Write(indentBy(4), "path: uri,")
+	f.Write(indentBy(4), "method: ", strconv.Quote(rule.Method), ",")
+	f.Write(indentBy(4), "body,")
+	f.Write(indentBy(3), "}, {")
+	f.Write(indentBy(4), "service: \"", method.Parent().Name(), "\",")
+	f.Write(indentBy(4), "method: \"", method.Name(), "\",")
+	f.Write(indentBy(3), "}) as Promise<", outputType.Reference(), ">;")
+	f.Write(indentBy(2), "},")
 	return nil
 }
 
@@ -123,9 +123,9 @@ func (s serviceGenerator) generateMethodPathValidation(
 		nullPath := nullPropagationPath(fp, input)
 		protoPath := strings.Join(fp, ".")
 		errMsg := "missing required field request." + protoPath
-		f.Print(indentBy(3), "if (!request.", nullPath, ") {")
-		f.Print(indentBy(4), "throw new Error(", strconv.Quote(errMsg), ");")
-		f.Print(indentBy(3), "}")
+		f.Write(indentBy(3), "if (!request.", nullPath, ") {")
+		f.Write(indentBy(4), "throw new Error(", strconv.Quote(errMsg), ");")
+		f.Write(indentBy(3), "}")
 	}
 }
 
@@ -152,7 +152,7 @@ func (s serviceGenerator) generateMethodPath(
 	if rule.Template.Verb != "" {
 		path += ":" + rule.Template.Verb
 	}
-	f.Print(indentBy(3), "const path = `", path, "`; // eslint-disable-line quotes")
+	f.Write(indentBy(3), "const path = `", path, "`; // eslint-disable-line quotes")
 }
 
 func (s serviceGenerator) generateMethodBody(
@@ -162,12 +162,12 @@ func (s serviceGenerator) generateMethodBody(
 ) {
 	switch {
 	case rule.Body == "":
-		f.Print(indentBy(3), "const body = null;")
+		f.Write(indentBy(3), "const body = null;")
 	case rule.Body == "*":
-		f.Print(indentBy(3), "const body = JSON.stringify(request);")
+		f.Write(indentBy(3), "const body = JSON.stringify(request);")
 	default:
 		nullPath := nullPropagationPath(httprule.FieldPath{rule.Body}, input)
-		f.Print(indentBy(3), "const body = JSON.stringify(request?.", nullPath, " ?? {});")
+		f.Write(indentBy(3), "const body = JSON.stringify(request?.", nullPath, " ?? {});")
 	}
 }
 
@@ -176,7 +176,7 @@ func (s serviceGenerator) generateMethodQuery(
 	input protoreflect.MessageDescriptor,
 	rule httprule.Rule,
 ) {
-	f.Print(indentBy(3), "const queryParams: string[] = [];")
+	f.Write(indentBy(3), "const queryParams: string[] = [];")
 	// nothing in query
 	if rule.Body == "*" {
 		return
@@ -198,16 +198,16 @@ func (s serviceGenerator) generateMethodQuery(
 		}
 		nullPath := nullPropagationPath(path, input)
 		jp := jsonPath(path, input)
-		f.Print(indentBy(3), "if (request.", nullPath, ") {")
+		f.Write(indentBy(3), "if (request.", nullPath, ") {")
 		switch {
 		case field.IsList():
-			f.Print(indentBy(4), "request.", jp, ".forEach((x) => {")
-			f.Print(indentBy(5), "queryParams.push(`", jp, "=${encodeURIComponent(x.toString())}`)")
-			f.Print(indentBy(4), "})")
+			f.Write(indentBy(4), "request.", jp, ".forEach((x) => {")
+			f.Write(indentBy(5), "queryParams.push(`", jp, "=${encodeURIComponent(x.toString())}`)")
+			f.Write(indentBy(4), "})")
 		default:
-			f.Print(indentBy(4), "queryParams.push(`", jp, "=${encodeURIComponent(request.", jp, ".toString())}`)")
+			f.Write(indentBy(4), "queryParams.push(`", jp, "=${encodeURIComponent(request.", jp, ".toString())}`)")
 		}
-		f.Print(indentBy(3), "}")
+		f.Write(indentBy(3), "}")
 	})
 }
 
