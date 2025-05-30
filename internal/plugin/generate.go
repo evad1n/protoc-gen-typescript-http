@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -13,7 +14,45 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
+type generatorOptions struct {
+	verbose bool
+	jsdoc   bool
+}
+
+func (o generatorOptions) String() string {
+	var opts []string
+	opts = append(opts, fmt.Sprintf("verbose=%v", o.verbose))
+	opts = append(opts, fmt.Sprintf("jsdoc=%v", o.jsdoc))
+	return strings.Join(opts, ",")
+}
+
+func log(args ...any) {
+	fmt.Fprint(os.Stderr, "protoc-gen-typescript-http: ")
+	fmt.Fprintln(os.Stderr, args...)
+}
+
+var (
+	options generatorOptions
+)
+
 func Generate(request *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorResponse, error) {
+	opts, err := parseOptions(request.GetParameter())
+	if err != nil {
+		return nil, fmt.Errorf("parse options: %w", err)
+	}
+
+	options = opts
+
+	if options.verbose {
+		// Print options
+		log("options:", options)
+
+		log("generating files for", len(request.GetFileToGenerate()), "files")
+		for _, f := range request.GetFileToGenerate() {
+			log("generating file", f)
+		}
+	}
+
 	generate := make(map[string]struct{})
 	registry, err := protodesc.NewFiles(&descriptorpb.FileDescriptorSet{
 		File: request.GetProtoFile(),
@@ -40,8 +79,8 @@ func Generate(request *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorRe
 		if err := (packageGenerator{pkg: pkg, files: files}).Generate(&index); err != nil {
 			return nil, fmt.Errorf("generate package '%s': %w", pkg, err)
 		}
-		index.P()
-		index.P("// @@protoc_insertion_point(typescript-http-eof)")
+		index.Print()
+		index.Print("// @@protoc_insertion_point(typescript-http-eof)")
 		res.File = append(res.File, &pluginpb.CodeGeneratorResponse_File{
 			Name:    proto.String(path.Join(indexPathElems...)),
 			Content: proto.String(string(index.Content())),
@@ -49,4 +88,33 @@ func Generate(request *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorRe
 	}
 	res.SupportedFeatures = proto.Uint64(uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL))
 	return &res, nil
+}
+
+// Looks like `jsdoc=true,verbose=true,param`
+func parseOptions(parameterString string) (generatorOptions, error) {
+	opts := generatorOptions{}
+	if parameterString == "" {
+		return opts, nil
+	}
+	for _, opt := range strings.Split(parameterString, ",") {
+		opt = strings.TrimSpace(opt)
+		if opt == "" {
+			continue
+		}
+		parts := strings.SplitN(opt, "=", 2)
+		key := parts[0]
+		val := "true"
+		if len(parts) == 2 {
+			val = parts[1]
+		}
+		switch key {
+		case "jsdoc":
+			opts.jsdoc = val == "true"
+		case "verbose":
+			opts.verbose = val == "true"
+		default:
+			return opts, fmt.Errorf("unknown option: %s", key)
+		}
+	}
+	return opts, nil
 }
