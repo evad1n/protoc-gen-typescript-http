@@ -53,6 +53,6 @@ func rangeEnumValues(enum protoreflect.EnumDescriptor, f func(value protoreflect
 	}
 }
 
-func t(n int) string {
+func indentBy(n int) string {
 	return strings.Repeat("  ", n)
 }
