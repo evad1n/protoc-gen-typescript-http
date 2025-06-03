@@ -89,11 +89,12 @@ func (s serviceGenerator) generateMethod(f *codegen.File, method protoreflect.Me
 	if err != nil {
 		return fmt.Errorf("parse http rule: %w", err)
 	}
+	log("generating method:", method.FullName(), r)
 	f.Write(indentBy(2), method.Name(), "(request) { // eslint-disable-line @typescript-eslint/no-unused-vars")
-	s.generateMethodPathValidation(f, method.Input(), rule)
-	s.generateMethodPath(f, method.Input(), rule)
-	s.generateMethodBody(f, method.Input(), rule)
-	s.generateMethodQuery(f, method.Input(), rule)
+	s.generateMethodPathValidation(f, method, rule)
+	s.generateMethodPath(f, method, rule)
+	s.generateMethodBody(f, method, rule)
+	s.generateMethodQuery(f, method, rule)
 	f.Write(indentBy(3), "let uri = path;")
 	f.Write(indentBy(3), "if (queryParams.length > 0) {")
 	f.Write(indentBy(4), "uri += `?${queryParams.join(\"&\")}`")
@@ -112,15 +113,17 @@ func (s serviceGenerator) generateMethod(f *codegen.File, method protoreflect.Me
 
 func (s serviceGenerator) generateMethodPathValidation(
 	f *codegen.File,
-	input protoreflect.MessageDescriptor,
+	method protoreflect.MethodDescriptor,
 	rule httprule.Rule,
 ) {
+
+	// fmt.Fprintln(os.Stderr, "generateMethodPathValidation", rule.Method, rule.Template.Segments)
 	for _, seg := range rule.Template.Segments {
 		if seg.Kind != httprule.SegmentKindVariable {
 			continue
 		}
 		fp := seg.Variable.FieldPath
-		nullPath := nullPropagationPath(fp, input)
+		nullPath := nullPropagationPath(fp, method)
 		protoPath := strings.Join(fp, ".")
 		errMsg := "missing required field request." + protoPath
 		f.Write(indentBy(3), "if (!request.", nullPath, ") {")
@@ -131,14 +134,14 @@ func (s serviceGenerator) generateMethodPathValidation(
 
 func (s serviceGenerator) generateMethodPath(
 	f *codegen.File,
-	input protoreflect.MessageDescriptor,
+	method protoreflect.MethodDescriptor,
 	rule httprule.Rule,
 ) {
 	pathParts := make([]string, 0, len(rule.Template.Segments))
 	for _, seg := range rule.Template.Segments {
 		switch seg.Kind {
 		case httprule.SegmentKindVariable:
-			fieldPath := jsonPath(seg.Variable.FieldPath, input)
+			fieldPath := jsonPath(seg.Variable.FieldPath, method)
 			pathParts = append(pathParts, "${request."+fieldPath+"}")
 		case httprule.SegmentKindLiteral:
 			pathParts = append(pathParts, seg.Literal)
@@ -157,7 +160,7 @@ func (s serviceGenerator) generateMethodPath(
 
 func (s serviceGenerator) generateMethodBody(
 	f *codegen.File,
-	input protoreflect.MessageDescriptor,
+	method protoreflect.MethodDescriptor,
 	rule httprule.Rule,
 ) {
 	switch {
@@ -166,14 +169,14 @@ func (s serviceGenerator) generateMethodBody(
 	case rule.Body == "*":
 		f.Write(indentBy(3), "const body = JSON.stringify(request);")
 	default:
-		nullPath := nullPropagationPath(httprule.FieldPath{rule.Body}, input)
+		nullPath := nullPropagationPath(httprule.FieldPath{rule.Body}, method)
 		f.Write(indentBy(3), "const body = JSON.stringify(request?.", nullPath, " ?? {});")
 	}
 }
 
 func (s serviceGenerator) generateMethodQuery(
 	f *codegen.File,
-	input protoreflect.MessageDescriptor,
+	method protoreflect.MethodDescriptor,
 	rule httprule.Rule,
 ) {
 	f.Write(indentBy(3), "const queryParams: string[] = [];")
@@ -189,15 +192,15 @@ func (s serviceGenerator) generateMethodQuery(
 		}
 		pathCovered[segment.Variable.FieldPath.String()] = struct{}{}
 	}
-	walkJSONLeafFields(input, func(path httprule.FieldPath, field protoreflect.FieldDescriptor) {
+	walkJSONLeafFields(method, func(path httprule.FieldPath, field protoreflect.FieldDescriptor) {
 		if _, ok := pathCovered[path.String()]; ok {
 			return
 		}
 		if rule.Body != "" && path[0] == rule.Body {
 			return
 		}
-		nullPath := nullPropagationPath(path, input)
-		jp := jsonPath(path, input)
+		nullPath := nullPropagationPath(path, method)
+		jp := jsonPath(path, method)
 		f.Write(indentBy(3), "if (request.", nullPath, ") {")
 		switch {
 		case field.IsList():
@@ -216,21 +219,26 @@ func supportedMethod(method protoreflect.MethodDescriptor) bool {
 	return ok && !method.IsStreamingClient() && !method.IsStreamingServer()
 }
 
-func jsonPath(path httprule.FieldPath, message protoreflect.MessageDescriptor) string {
-	return strings.Join(jsonPathSegments(path, message), ".")
+func jsonPath(path httprule.FieldPath, method protoreflect.MethodDescriptor) string {
+	return strings.Join(jsonPathSegments(path, method), ".")
 }
 
-func nullPropagationPath(path httprule.FieldPath, message protoreflect.MessageDescriptor) string {
-	return strings.Join(jsonPathSegments(path, message), "?.")
+func nullPropagationPath(path httprule.FieldPath, method protoreflect.MethodDescriptor) string {
+	return strings.Join(jsonPathSegments(path, method), "?.")
 }
 
-func jsonPathSegments(path httprule.FieldPath, message protoreflect.MessageDescriptor) []string {
+func jsonPathSegments(path httprule.FieldPath, method protoreflect.MethodDescriptor) []string {
+	message := method.Input()
 	segs := make([]string, len(path))
 	for i, p := range path {
 		field := message.Fields().ByName(protoreflect.Name(p))
-		segs[i] = field.JSONName()
-		if i < len(path) {
-			message = field.Message()
+		if field == nil {
+			log(fmt.Sprintf("warning: (%s) field %q not found in message %q", method.FullName(), p, message.FullName()))
+		} else {
+			segs[i] = field.JSONName()
+			if i < len(path) {
+				message = field.Message()
+			}
 		}
 	}
 	return segs
