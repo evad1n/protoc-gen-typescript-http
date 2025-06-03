@@ -26,14 +26,19 @@ func (o generatorOptions) String() string {
 	return strings.Join(opts, ",")
 }
 
+var (
+	options          generatorOptions
+	generationErrors []error
+)
+
 func log(args ...any) {
 	fmt.Fprint(os.Stderr, "protoc-gen-typescript-http: ")
 	fmt.Fprintln(os.Stderr, args...)
 }
 
-var (
-	options generatorOptions
-)
+func addGenerationError(err error) {
+	generationErrors = append(generationErrors, err)
+}
 
 func Generate(request *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorResponse, error) {
 	opts, err := parseOptions(request.GetParameter())
@@ -87,6 +92,15 @@ func Generate(request *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorRe
 		})
 	}
 	res.SupportedFeatures = proto.Uint64(uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL))
+
+	if len(generationErrors) > 0 {
+		log("generation errors:")
+		for _, err := range generationErrors {
+			log(" -", err)
+		}
+		return nil, fmt.Errorf("generation errors: %d", len(generationErrors))
+	}
+
 	return &res, nil
 }
 

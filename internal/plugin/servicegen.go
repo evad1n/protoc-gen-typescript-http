@@ -233,7 +233,9 @@ func jsonPathSegments(path httprule.FieldPath, method protoreflect.MethodDescrip
 	for i, p := range path {
 		field := message.Fields().ByName(protoreflect.Name(p))
 		if field == nil {
-			log(fmt.Sprintf("warning: (%s) field %q not found in message %q", method.FullName(), p, message.FullName()))
+			err := fmt.Errorf("ERROR: (%s) field %q not found in message %q", method.FullName(), p, message.FullName())
+			log(err)
+			addGenerationError(err)
 		} else {
 			segs[i] = field.JSONName()
 			if i < len(path) {
