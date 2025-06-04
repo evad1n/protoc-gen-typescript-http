@@ -89,7 +89,7 @@ func (s serviceGenerator) generateMethod(f *codegen.File, method protoreflect.Me
 	if err != nil {
 		return fmt.Errorf("parse http rule: %w", err)
 	}
-	log("generating method:", method.FullName(), r)
+	logV("generating method:", method.FullName(), r)
 	f.Write(indentBy(2), method.Name(), "(request) { // eslint-disable-line @typescript-eslint/no-unused-vars")
 	s.generateMethodPathValidation(f, method, rule)
 	s.generateMethodPath(f, method, rule)
@@ -234,7 +234,7 @@ func jsonPathSegments(path httprule.FieldPath, method protoreflect.MethodDescrip
 		field := message.Fields().ByName(protoreflect.Name(p))
 		if field == nil {
 			err := fmt.Errorf("ERROR: (%s) field %q not found in message %q", method.FullName(), p, message.FullName())
-			log(err)
+			logV(err)
 			addGenerationError(err)
 		} else {
 			segs[i] = field.JSONName()

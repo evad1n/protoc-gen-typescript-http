@@ -36,6 +36,14 @@ func log(args ...any) {
 	fmt.Fprintln(os.Stderr, args...)
 }
 
+// logV is a verbose log function that only logs if verbose mode is enabled.
+func logV(args ...any) {
+	if !options.verbose {
+		return
+	}
+	log(args...)
+}
+
 func addGenerationError(err error) {
 	generationErrors = append(generationErrors, err)
 }
@@ -48,14 +56,11 @@ func Generate(request *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorRe
 
 	options = opts
 
-	if options.verbose {
-		// Print options
-		log("options:", options)
+	logV("options:", options)
 
-		log("generating files for", len(request.GetFileToGenerate()), "files")
-		for _, f := range request.GetFileToGenerate() {
-			log("generating file", f)
-		}
+	logV("generating files for", len(request.GetFileToGenerate()), "files")
+	for _, f := range request.GetFileToGenerate() {
+		logV("generating file", f)
 	}
 
 	generate := make(map[string]struct{})
@@ -96,9 +101,9 @@ func Generate(request *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorRe
 	if len(generationErrors) > 0 {
 		log("generation errors:")
 		for _, err := range generationErrors {
-			log(" -", err)
+			log(err)
 		}
-		return nil, fmt.Errorf("generation errors: %d", len(generationErrors))
+		return nil, fmt.Errorf("encountered %d errors during generation", len(generationErrors))
 	}
 
 	return &res, nil
