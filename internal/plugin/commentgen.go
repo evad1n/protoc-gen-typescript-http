@@ -17,35 +17,20 @@ func (c commentGenerator) generateLeading(f *codegen.File, indent int) {
 	loc := c.descriptor.ParentFile().SourceLocations().ByDescriptor(c.descriptor)
 	lines := strings.Split(loc.LeadingComments, "\n")
 
-	if options.jsdoc {
-		f.Write(indentBy(indent), "/**")
-		for _, line := range lines {
-			if line == "" {
-				continue
-			}
-			f.Write(indentBy(indent), " * ", strings.TrimSpace(line))
+	f.Write(indentBy(indent), "/**")
+	for _, line := range lines {
+		if line == "" {
+			continue
 		}
-		if field, ok := c.descriptor.(protoreflect.FieldDescriptor); ok {
-			if behaviorComment := fieldBehaviorComment(field); len(behaviorComment) > 0 {
-				f.Write(indentBy(indent), " * ")
-				f.Write(indentBy(indent), " * ", behaviorComment)
-			}
-		}
-		f.Write(indentBy(indent), " */")
-	} else {
-		for _, line := range lines {
-			if line == "" {
-				continue
-			}
-			f.Write(indentBy(indent), "// ", strings.TrimSpace(line))
-		}
-		if field, ok := c.descriptor.(protoreflect.FieldDescriptor); ok {
-			if behaviorComment := fieldBehaviorComment(field); len(behaviorComment) > 0 {
-				f.Write(indentBy(indent), "//")
-				f.Write(indentBy(indent), "// ", behaviorComment)
-			}
+		f.Write(indentBy(indent), " * ", strings.TrimSpace(line))
+	}
+	if field, ok := c.descriptor.(protoreflect.FieldDescriptor); ok {
+		if behaviorComment := fieldBehaviorComment(field); len(behaviorComment) > 0 {
+			f.Write(indentBy(indent), " * ")
+			f.Write(indentBy(indent), " * ", behaviorComment)
 		}
 	}
+	f.Write(indentBy(indent), " */")
 }
 
 func fieldBehaviorComment(field protoreflect.FieldDescriptor) string {
@@ -58,6 +43,7 @@ func fieldBehaviorComment(field protoreflect.FieldDescriptor) string {
 	for _, b := range behaviors {
 		behaviorStrings = append(behaviorStrings, b.String())
 	}
+
 	return "Behaviors: " + strings.Join(behaviorStrings, ", ")
 }
 

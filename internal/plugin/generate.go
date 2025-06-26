@@ -16,13 +16,11 @@ import (
 
 type generatorOptions struct {
 	verbose bool
-	jsdoc   bool
 }
 
 func (o generatorOptions) String() string {
 	var opts []string
 	opts = append(opts, fmt.Sprintf("verbose=%v", o.verbose))
-	opts = append(opts, fmt.Sprintf("jsdoc=%v", o.jsdoc))
 	return strings.Join(opts, ",")
 }
 
@@ -127,8 +125,6 @@ func parseOptions(parameterString string) (generatorOptions, error) {
 			val = parts[1]
 		}
 		switch key {
-		case "jsdoc":
-			opts.jsdoc = val == "true"
 		case "verbose":
 			opts.verbose = val == "true"
 		default:
