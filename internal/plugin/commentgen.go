@@ -17,18 +17,34 @@ func (c commentGenerator) generateLeading(f *codegen.File, indent int) {
 	loc := c.descriptor.ParentFile().SourceLocations().ByDescriptor(c.descriptor)
 	lines := strings.Split(loc.LeadingComments, "\n")
 
-	f.Write(indentBy(indent), "/**")
+	// Collect comment lines
+	commentLines := make([]string, 0, len(lines))
 	for _, line := range lines {
 		if line == "" {
 			continue
 		}
-		f.Write(indentBy(indent), " * ", strings.TrimSpace(line))
+		commentLines = append(commentLines, strings.TrimSpace(line))
 	}
+
+	var behaviorComment string
 	if field, ok := c.descriptor.(protoreflect.FieldDescriptor); ok {
-		if behaviorComment := fieldBehaviorComment(field); len(behaviorComment) > 0 {
+		behaviorComment = fieldBehaviorComment(field)
+	}
+
+	// If there are no comments and no behaviors, do not write anything
+	if len(commentLines) == 0 && len(behaviorComment) == 0 {
+		return
+	}
+
+	f.Write(indentBy(indent), "/**")
+	for _, line := range commentLines {
+		f.Write(indentBy(indent), " * ", line)
+	}
+	if len(behaviorComment) > 0 {
+		if len(commentLines) > 0 {
 			f.Write(indentBy(indent), " * ")
-			f.Write(indentBy(indent), " * ", behaviorComment)
 		}
+		f.Write(indentBy(indent), " * ", behaviorComment)
 	}
 	f.Write(indentBy(indent), " */")
 }
