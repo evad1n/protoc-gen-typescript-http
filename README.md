@@ -17,7 +17,7 @@ look at [examples](./examples).
 ### Install the plugin
 
 ```bash
-go install github.com/evad1n/protoc-gen-typescript-http
+go install github.com/evad1n/protoc-gen-typescript-http@latest
 ```
 
 ### Invocation
@@ -37,13 +37,12 @@ plugins:
   - local: protoc-gen-typescript-http
     out: src/gen
     opt:
-      - jsdoc=true
+      - verbose=true
 ```
 
 ### Options
 
 - `verbose` - print some extra information when running
-- `jsdoc` - Use JSDOC comments
 
 
 ______________________________________________________________________
