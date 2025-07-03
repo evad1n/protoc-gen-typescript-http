@@ -1,0 +1,18 @@
+version: v2
+
+managed:
+  enabled: true
+  disable:
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
+
+plugins:
+  - local: protoc-gen-typescript-http
+    out: gen
+    opt:
+      - verbose=true
+
+inputs:
+  - directory: .
+    paths:
+      - ./api

@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package simple;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
+
+// A simple message representing a user.
+message User {
+  int32 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string name = 2 [(google.api.field_behavior) = REQUIRED];
+  string email = 3;
+  string favorite_color = 4 [(google.api.field_behavior) = OPTIONAL];
+  google.protobuf.Timestamp created_date = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// A simple service definition.
+service UserService {
+  // Gets a user by ID.
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (google.api.method_signature) = "id";
+    option (google.api.http) = {get: "/api/{id=users/*}"};
+  }
+  // Creates a new user.
+  rpc CreateUser(CreateUserRequest) returns (User) {
+    option (google.api.method_signature) = "user";
+    option (google.api.http) = {
+      post: "/api/users"
+      body: "user"
+    };
+  }
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.method_signature) = "id";
+    option (google.api.http) = {delete: "/api/{id=users/*}"};
+  }
+}
+
+// Request message for GetUser.
+message GetUserRequest {
+  int32 id = 1;
+}
+
+// Request message for CreateUser.
+message CreateUserRequest {
+  User user = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Request message for DeleteUser.
+message DeleteUserRequest {
+  int32 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
