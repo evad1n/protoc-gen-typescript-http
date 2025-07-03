@@ -11,16 +11,23 @@ import (
 )
 
 type serviceGenerator struct {
-	pkg        protoreflect.FullName
-	genHandler bool
-	service    protoreflect.ServiceDescriptor
+	pkg     protoreflect.FullName
+	service protoreflect.ServiceDescriptor
+}
+
+func GenerateServiceHeader(f *codegen.File) {
+	f.Write("type RequestType = {")
+	f.Write(indentBy(1), "path: string;")
+	f.Write(indentBy(1), "method: string;")
+	f.Write(indentBy(1), "body: string | null;")
+	f.Write("};")
+	f.Write()
+	f.Write("type RequestHandler = (request: RequestType, meta: { service: string, method: string }) => Promise<unknown>;")
+	f.Write()
 }
 
 func (s serviceGenerator) Generate(f *codegen.File) error {
 	s.generateInterface(f)
-	if s.genHandler {
-		s.generateHandler(f)
-	}
 	return s.generateClient(f)
 }
 
@@ -34,20 +41,19 @@ func (s serviceGenerator) generateInterface(f *codegen.File) {
 		commentGenerator{descriptor: method}.generateLeading(f, 1)
 		input := typeFromMessage(s.pkg, method.Input())
 		output := typeFromMessage(s.pkg, method.Output())
-		f.Write(indentBy(1), method.Name(), "(request: ", input.Reference(), "): Promise<", output.Reference(), ">;")
+
+		inputName := suffixName(input.Reference(), REQUEST_SUFFIX)
+		if _, ok := WellKnownType(method.Input()); ok {
+			inputName = input.Reference()
+		}
+		outputName := suffixName(output.Reference(), RESPONSE_SUFFIX)
+		if _, ok := WellKnownType(method.Output()); ok {
+			outputName = output.Reference()
+		}
+
+		f.Write(indentBy(1), method.Name(), "(request: ", inputName, "): Promise<", outputName, ">;")
 	})
 	f.Write("}")
-	f.Write()
-}
-
-func (s serviceGenerator) generateHandler(f *codegen.File) {
-	f.Write("type RequestType = {")
-	f.Write(indentBy(1), "path: string;")
-	f.Write(indentBy(1), "method: string;")
-	f.Write(indentBy(1), "body: string | null;")
-	f.Write("};")
-	f.Write()
-	f.Write("type RequestHandler = (request: RequestType, meta: { service: string, method: string }) => Promise<unknown>;")
 	f.Write()
 }
 
@@ -81,15 +87,15 @@ func (s serviceGenerator) generateClient(f *codegen.File) error {
 
 func (s serviceGenerator) generateMethod(f *codegen.File, method protoreflect.MethodDescriptor) error {
 	outputType := typeFromMessage(s.pkg, method.Output())
-	r, ok := httprule.Get(method)
+	httpRule, ok := httprule.Get(method)
 	if !ok {
 		return nil
 	}
-	rule, err := httprule.ParseRule(r)
+	rule, err := httprule.ParseRule(httpRule)
 	if err != nil {
 		return fmt.Errorf("parse http rule: %w", err)
 	}
-	logV("generating method:", method.FullName(), r)
+	logV("generating method:", method.FullName(), httpRule)
 	f.Write(indentBy(2), method.Name(), "(request) { // eslint-disable-line @typescript-eslint/no-unused-vars")
 	s.generateMethodPathValidation(f, method, rule)
 	s.generateMethodPath(f, method, rule)

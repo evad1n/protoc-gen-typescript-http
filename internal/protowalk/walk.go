@@ -6,6 +6,7 @@ import (
 
 type WalkFunc func(desc protoreflect.Descriptor) bool
 
+// WalkFiles uses the return of the WalkFunc f to determine if it should continue walking the rest of the descriptors in the file.
 func WalkFiles(files []protoreflect.FileDescriptor, f WalkFunc) {
 	var w walker
 	w.walkFiles(files, f)

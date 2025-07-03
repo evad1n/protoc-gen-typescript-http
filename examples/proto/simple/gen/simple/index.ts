@@ -3,16 +3,18 @@
 // @ts-nocheck
 
 /**
- * An empty JSON object
- */
-type wellKnownEmpty = Record<never, never>;
-
-/**
  * Encoded using RFC 3339, where generated output will always be Z-normalized
  * and uses 0, 3, 6 or 9 fractional digits.
  * Offsets other than "Z" are also accepted.
  */
 type wellKnownTimestamp = string;
+
+type wellKnownStringValue = string | null;
+
+/**
+ * An empty JSON object
+ */
+type wellKnownEmpty = Record<never, never>;
 
 type RequestType = {
   path: string;
@@ -22,6 +24,220 @@ type RequestType = {
 
 type RequestHandler = (request: RequestType, meta: { service: string, method: string }) => Promise<unknown>;
 
+/**
+ * Request message for CreateUser.
+ */
+export type CreateUserRequest = {
+  /**
+   * Behaviors: REQUIRED
+   */
+  user: UserRequest;
+};
+
+/**
+ * A simple message representing a user.
+ */
+export type UserRequest = {
+  /**
+   * Behaviors: REQUIRED
+   */
+  name: string;
+  email: string;
+  /**
+   * Behaviors: OPTIONAL
+   */
+  favoriteColor?: string;
+};
+
+/**
+ * Request message for DeleteUser.
+ */
+export type DeleteUserRequest = {
+  /**
+   * Behaviors: REQUIRED
+   */
+  id: number;
+};
+
+export type ElementResponse = {
+  /**
+   * The rsource name of the element.
+   * Format: orgs/{org}/elements/{element}
+   * 
+   * Behaviors: IDENTIFIER
+   */
+  name: string;
+  /**
+   * The human-readable title of the element.
+   * 
+   * Behaviors: REQUIRED
+   */
+  title: string;
+  /**
+   * the input element_ids that input to this node
+   * 
+   * Behaviors: REQUIRED
+   */
+  inputs: string[];
+  /**
+   * whether the element referenced by input[i] is from a discard list
+   * 
+   * Behaviors: OUTPUT_ONLY
+   */
+  inputIsDiscard: boolean[];
+  /**
+   * The labels of the element.
+   * 
+   * Behaviors: OUTPUT_ONLY
+   */
+  labels: string[];
+  /**
+   * The created date of the element.
+   * 
+   * Behaviors: OUTPUT_ONLY
+   */
+  createTime: wellKnownTimestamp;
+  /**
+   * The last edited date of the element.
+   * 
+   * Behaviors: OUTPUT_ONLY
+   */
+  updateTime: wellKnownTimestamp;
+  /**
+   * element's description field.
+   * 
+   * Behaviors: OPTIONAL
+   */
+  description: wellKnownStringValue;
+  /**
+   * the pipeline canvas sid this element belongs to
+   * 
+   * Behaviors: OUTPUT_ONLY
+   */
+  pipelineCanvasSid: number;
+};
+
+/**
+ * Request message for creating an element
+ */
+export type CreateElementRequest = {
+  /**
+   * The parent resource where the element will be created
+   * 
+   * Behaviors: REQUIRED
+   */
+  parent: string;
+  /**
+   * The element to create
+   * 
+   * Behaviors: REQUIRED
+   */
+  element: ElementRequest;
+  /**
+   * The ID to use for the element
+   * 
+   * Behaviors: OPTIONAL
+   */
+  elementId?: string;
+};
+
+export type ElementRequest = {
+  /**
+   * The rsource name of the element.
+   * Format: orgs/{org}/elements/{element}
+   * 
+   * Behaviors: IDENTIFIER
+   */
+  name: string;
+  /**
+   * The human-readable title of the element.
+   * 
+   * Behaviors: REQUIRED
+   */
+  title: string;
+  /**
+   * the input element_ids that input to this node
+   * 
+   * Behaviors: REQUIRED
+   */
+  inputs: string[];
+  /**
+   * element's description field.
+   * 
+   * Behaviors: OPTIONAL
+   */
+  description?: wellKnownStringValue;
+};
+
+/**
+ * A simple message representing a user.
+ */
+export type UserResponse = {
+  /**
+   * Behaviors: OUTPUT_ONLY
+   */
+  id: number;
+  /**
+   * Behaviors: REQUIRED
+   */
+  name: string;
+  email: string;
+  /**
+   * Behaviors: OPTIONAL
+   */
+  favoriteColor: string;
+  /**
+   * Behaviors: OUTPUT_ONLY
+   */
+  createdDate: wellKnownTimestamp;
+};
+
+/**
+ * Request message for GetUser.
+ */
+export type GetUserRequest = {
+  id: number;
+};
+
+/**
+ * ElementService provides methods for managing pipeline elements
+ */
+export interface ElementService {
+  /**
+   * CreateElement creates a new pipeline element
+   */
+  CreateElement(request: CreateElementRequest): Promise<ElementResponse>;
+}
+
+export function createElementServiceClient(
+  handler: RequestHandler
+): ElementService {
+  return {
+    CreateElement(request) { // eslint-disable-line @typescript-eslint/no-unused-vars
+      if (!request.parent) {
+        throw new Error("missing required field request.parent");
+      }
+      const path = `tcn/lms/element/v1alpha1/${request.parent}/elements`; // eslint-disable-line quotes
+      const body = JSON.stringify(request?.element ?? {});
+      const queryParams: string[] = [];
+      if (request.elementId) {
+        queryParams.push(`elementId=${encodeURIComponent(request.elementId.toString())}`)
+      }
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join("&")}`
+      }
+      return handler({
+        path: uri,
+        method: "POST",
+        body,
+      }, {
+        service: "ElementService",
+        method: "CreateElement",
+      }) as Promise<Element>;
+    },
+  };
+}
 /**
  * A simple service definition.
  */
@@ -100,70 +316,5 @@ export function createUserServiceClient(
     },
   };
 }
-/**
- * A simple message representing a user.
- */
-export type UserResponse = {
-  /**
-   * Behaviors: OUTPUT_ONLY
-   */
-  id: number;
-  /**
-   * Behaviors: REQUIRED
-   */
-  name: string;
-  email: string;
-  /**
-   * Behaviors: OPTIONAL
-   */
-  favoriteColor: string;
-  /**
-   * Behaviors: OUTPUT_ONLY
-   */
-  createdDate: wellKnownTimestamp;
-};
-
-/**
- * Request message for GetUser.
- */
-export type GetUserRequest = {
-  id: number;
-};
-
-/**
- * Request message for CreateUser.
- */
-export type CreateUserRequest = {
-  /**
-   * Behaviors: REQUIRED
-   */
-  user: UserRequest;
-};
-
-/**
- * A simple message representing a user.
- */
-export type UserRequest = {
-  /**
-   * Behaviors: REQUIRED
-   */
-  name: string;
-  email: string;
-  /**
-   * Behaviors: OPTIONAL
-   */
-  favoriteColor?: string;
-};
-
-/**
- * Request message for DeleteUser.
- */
-export type DeleteUserRequest = {
-  /**
-   * Behaviors: REQUIRED
-   */
-  id: number;
-};
-
 
 // @@protoc_insertion_point(typescript-http-eof)

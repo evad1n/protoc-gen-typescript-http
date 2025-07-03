@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"fmt"
 	"strings"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -53,6 +54,21 @@ func rangeEnumValues(enum protoreflect.EnumDescriptor, f func(value protoreflect
 	}
 }
 
+// indentBy is a utility function that returns a string with `n` levels of indentation, where each level is represented by two spaces.
 func indentBy(n int) string {
 	return strings.Repeat("  ", n)
+}
+
+const (
+	REQUEST_SUFFIX  = "__Request"
+	RESPONSE_SUFFIX = "__Response"
+)
+
+// suffixName is a utility function that appends a suffix to a name if it does not already end with that suffix.
+func suffixName(name string, suffix string) string {
+	if strings.HasSuffix(name, suffix) {
+		return name
+	}
+
+	return fmt.Sprintf("%s%s", name, suffix)
 }

@@ -28,4 +28,5 @@ func (e enumGenerator) Generate(f *codegen.File) {
 			f.Write(indentBy(1), "| ", strconv.Quote(string(value.Name())))
 		}
 	})
+	f.Write()
 }

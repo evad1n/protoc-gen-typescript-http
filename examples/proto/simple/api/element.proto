@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package simple;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
+
+message Element {
+  option (google.api.resource) = {
+    type: "tcn.lms.element.v1alpha1/Element"
+    pattern: "orgs/{org}/elements/{element}"
+    plural: "elements"
+    singular: "element"
+  };
+
+    // The rsource name of the element.
+  // Format: orgs/{org}/elements/{element}
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+
+  // The human-readable title of the element.
+  string title = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // the input element_ids that input to this node
+  repeated string inputs = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // whether the element referenced by input[i] is from a discard list
+  repeated bool input_is_discard = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The labels of the element.
+  repeated string labels = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The created date of the element.
+  google.protobuf.Timestamp create_time = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The last edited date of the element.
+  google.protobuf.Timestamp update_time = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // element's description field.
+  google.protobuf.StringValue description = 10 [(google.api.field_behavior) = OPTIONAL];
+
+  // the pipeline canvas sid this element belongs to
+  int64 pipeline_canvas_sid = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Request message for creating an element
+message CreateElementRequest {
+  // The parent resource where the element will be created
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).child_type = "tcn.lms.element.v1alpha1/Element"
+  ];
+
+  // The element to create
+  Element element = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // The ID to use for the element
+  string element_id = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// ElementService provides methods for managing pipeline elements
+service ElementService {
+  // CreateElement creates a new pipeline element
+  rpc CreateElement(CreateElementRequest) returns (Element) {
+    option (google.api.method_signature) = "parent,element,element_id";
+    option (google.api.http) = {
+      post: "/tcn/lms/element/v1alpha1/{parent=orgs/*}/elements"
+      body: "element"
+    };
+  }
+}
