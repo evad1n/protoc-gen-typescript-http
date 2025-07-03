@@ -78,7 +78,7 @@ func (m messageGenerator) generateRequestType(f *codegen.File) {
 		if field.Kind() == protoreflect.MessageKind {
 			message := field.Message()
 
-			messageRequiresDiscrimination := messageRequiresRequestDiscrimination(message, 0, make(map[protoreflect.FullName]bool))
+			messageRequiresDiscrimination := getMessageRequiresDiscrimination(message, 0, make(map[protoreflect.FullName]bool))
 
 			if messageRequiresDiscrimination {
 				fieldTypeName = suffixName(scopedDescriptorTypeName(m.pkg, message), REQUEST_SUFFIX)
@@ -140,7 +140,7 @@ func (m messageGenerator) generateResponseType(f *codegen.File) {
 		if field.Kind() == protoreflect.MessageKind {
 			message := field.Message()
 
-			messageRequiresDiscrimination := messageRequiresRequestDiscrimination(message, 0, make(map[protoreflect.FullName]bool))
+			messageRequiresDiscrimination := getMessageRequiresDiscrimination(message, 0, make(map[protoreflect.FullName]bool))
 
 			log(fmt.Sprintf("message %s requires discrimination: %t", message.FullName(), messageRequiresDiscrimination))
 
@@ -217,9 +217,9 @@ var behaviorsRequiringDiscrimination = []annotations.FieldBehavior{
 	annotations.FieldBehavior_OPTIONAL,
 }
 
-// messageRequiresRequestDiscrimination checks if any of a message's fields' behavior annotation suggests it should have different type definitions for the request and response. Works recursively through nested messages.
+// getMessageRequiresDiscrimination checks if any of a message's fields' behavior annotation suggests it should have different type definitions for the request and response. Works recursively through nested messages.
 // The visited map prevents infinite recursion in case of cyclic message references.
-func messageRequiresRequestDiscrimination(message protoreflect.MessageDescriptor, depth int, visited map[protoreflect.FullName]bool) bool {
+func getMessageRequiresDiscrimination(message protoreflect.MessageDescriptor, depth int, visited map[protoreflect.FullName]bool) bool {
 	if visited[message.FullName()] {
 		return false
 	}
@@ -231,13 +231,13 @@ func messageRequiresRequestDiscrimination(message protoreflect.MessageDescriptor
 		if field.Kind() == protoreflect.MessageKind {
 			nestedMessage := field.Message()
 
-			if messageRequiresRequestDiscrimination(nestedMessage, depth+1, visited) {
+			if getMessageRequiresDiscrimination(nestedMessage, depth+1, visited) {
 				messageRequiresDiscrimination = true
 			}
 			return
 		}
 
-		if fieldRequiresRequestDiscrimination(field) {
+		if getFieldRequiresRequestDiscrimination(field) {
 			messageRequiresDiscrimination = true
 		}
 	})
@@ -245,8 +245,8 @@ func messageRequiresRequestDiscrimination(message protoreflect.MessageDescriptor
 	return messageRequiresDiscrimination
 }
 
-// fieldRequiresRequestDiscrimination checks if a field's behavior annotation suggests it should have different type definitions for the request and response. Example: OUTPUT_ONLY would be a field that is not required in the request, but is present in the response.
-func fieldRequiresRequestDiscrimination(field protoreflect.FieldDescriptor) bool {
+// getFieldRequiresRequestDiscrimination checks if a field's behavior annotation suggests it should have different type definitions for the request and response. Example: OUTPUT_ONLY would be a field that is not required in the request, but is present in the response.
+func getFieldRequiresRequestDiscrimination(field protoreflect.FieldDescriptor) bool {
 	behaviors := getFieldBehaviors(field)
 	return slices.ContainsFunc(behaviors, func(b annotations.FieldBehavior) bool {
 		return slices.Contains(behaviorsRequiringDiscrimination, b)
