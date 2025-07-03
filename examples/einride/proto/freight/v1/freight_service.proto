@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package einride.example.freight.v1;
 
-import "einride/example/freight/v1/shipment.proto";
-import "einride/example/freight/v1/shipper.proto";
-import "einride/example/freight/v1/site.proto";
+import "proto/freight/v1/shipment.proto";
+import "proto/freight/v1/shipper.proto";
+import "proto/freight/v1/site.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";

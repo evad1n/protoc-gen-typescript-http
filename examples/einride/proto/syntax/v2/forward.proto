@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package einride.example.syntax.v2;
 
-import "einride/example/syntax/v1/syntax.proto";
+import "proto/syntax/v1/syntax.proto";
 
 // Message
 message Message {

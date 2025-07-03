@@ -142,8 +142,6 @@ func (m messageGenerator) generateResponseType(f *codegen.File) {
 
 			messageRequiresDiscrimination := getMessageRequiresDiscrimination(message, 0, make(map[protoreflect.FullName]bool))
 
-			log(fmt.Sprintf("message %s requires discrimination: %t", message.FullName(), messageRequiresDiscrimination))
-
 			if messageRequiresDiscrimination {
 				fieldTypeName = suffixName(scopedDescriptorTypeName(m.pkg, message), RESPONSE_SUFFIX)
 
