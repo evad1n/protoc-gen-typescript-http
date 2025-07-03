@@ -71,17 +71,22 @@ func Generate(request *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorRe
 	for _, f := range request.GetFileToGenerate() {
 		generate[f] = struct{}{}
 	}
-	packaged := make(map[protoreflect.FullName][]protoreflect.FileDescriptor)
+	packageRegistry := make(map[protoreflect.FullName][]protoreflect.FileDescriptor)
 	for _, f := range request.GetFileToGenerate() {
 		file, err := registry.FindFileByPath(f)
 		if err != nil {
 			return nil, fmt.Errorf("find file %s: %w", f, err)
 		}
-		packaged[file.Package()] = append(packaged[file.Package()], file)
+		packageRegistry[file.Package()] = append(packageRegistry[file.Package()], file)
 	}
 
 	var res pluginpb.CodeGeneratorResponse
-	for pkg, files := range packaged {
+	for pkg, files := range packageRegistry {
+		logV(fmt.Sprint(string(pkg), ":"))
+		for _, file := range files {
+			logV(fmt.Sprint(indentBy(1), file.Path()))
+		}
+
 		var index codegen.File
 		indexPathElems := append(strings.Split(string(pkg), "."), "index.ts")
 		if err := (packageGenerator{pkg: pkg, files: files}).Generate(&index); err != nil {
