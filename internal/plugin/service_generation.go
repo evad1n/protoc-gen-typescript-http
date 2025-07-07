@@ -42,11 +42,11 @@ func (s serviceGenerator) generateInterface(f *codegen.File) {
 		input := typeFromMessage(s.pkg, method.Input())
 		output := typeFromMessage(s.pkg, method.Output())
 
-		inputName := suffixName(input.Reference(), REQUEST_SUFFIX)
+		inputName := suffixName(input.Reference(), options.requestTypeSuffix)
 		if _, ok := GetWellKnownType(method.Input()); ok {
 			inputName = input.Reference()
 		}
-		outputName := suffixName(output.Reference(), RESPONSE_SUFFIX)
+		outputName := suffixName(output.Reference(), options.responseTypeSuffix)
 		if _, ok := GetWellKnownType(method.Output()); ok {
 			outputName = output.Reference()
 		}

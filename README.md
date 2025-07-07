@@ -43,7 +43,8 @@ plugins:
 ### Options
 
 - `verbose` - print some extra information when running
-
+- `requestTypeSuffix` - Suffix for generating request types. Default = `__Request`
+- `responseTypeSuffix` - Suffix for generating response types Default = `__Response`
 
 ______________________________________________________________________
 

@@ -15,7 +15,9 @@ import (
 )
 
 type generatorOptions struct {
-	verbose bool
+	verbose            bool
+	requestTypeSuffix  string
+	responseTypeSuffix string
 }
 
 func (o generatorOptions) String() string {
@@ -25,7 +27,11 @@ func (o generatorOptions) String() string {
 }
 
 var (
-	options          generatorOptions
+	options generatorOptions = generatorOptions{
+		verbose:            false,
+		requestTypeSuffix:  "__Request",
+		responseTypeSuffix: "__Response",
+	}
 	generationErrors []error
 )
 
@@ -112,7 +118,7 @@ func Generate(request *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorRe
 	return &res, nil
 }
 
-// Looks like `jsdoc=true,verbose=true,param`
+// Looks like `verbose=true,param=value`
 func parseOptions(parameterString string) (generatorOptions, error) {
 	opts := generatorOptions{}
 	if parameterString == "" {
@@ -132,6 +138,16 @@ func parseOptions(parameterString string) (generatorOptions, error) {
 		switch key {
 		case "verbose":
 			opts.verbose = val == "true"
+		case "requestTypeSuffix":
+			if val == "" {
+				return opts, fmt.Errorf("requestTypeSuffix cannot be empty")
+			}
+			opts.requestTypeSuffix = val
+		case "responseTypeSuffix":
+			if val == "" {
+				return opts, fmt.Errorf("responseTypeSuffix cannot be empty")
+			}
+			opts.responseTypeSuffix = val
 		default:
 			return opts, fmt.Errorf("unknown option: %s", key)
 		}

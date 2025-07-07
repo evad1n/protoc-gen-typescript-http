@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"fmt"
 	"slices"
 
 	"github.com/evad1n/protoc-gen-typescript-http/internal/codegen"
@@ -56,10 +55,9 @@ func (m messageGenerator) generateRequestType(f *codegen.File) {
 	// We are generating inline, so keep track of additional messages that need to be generated and generate at the end
 	additionalMessagesToGenerate := make(map[protoreflect.FullName]messageGenerator)
 
-	typeName := suffixName(scopedDescriptorTypeName(m.pkg, m.message), REQUEST_SUFFIX)
-	if existingType, ok := generatedMessagesRegistry[typeName]; ok {
+	typeName := suffixName(scopedDescriptorTypeName(m.pkg, m.message), options.requestTypeSuffix)
+	if _, ok := generatedMessagesRegistry[typeName]; ok {
 		// If the request type already exists, we can skip generating it.
-		log(fmt.Sprintf("skipping request type %s, already exists as %s", typeName, existingType))
 		return
 	}
 	generatedMessagesRegistry[typeName] = m.message
@@ -81,7 +79,7 @@ func (m messageGenerator) generateRequestType(f *codegen.File) {
 			messageRequiresDiscrimination := getMessageRequiresDiscrimination(message, 0, make(map[protoreflect.FullName]bool))
 
 			if messageRequiresDiscrimination {
-				fieldTypeName = suffixName(scopedDescriptorTypeName(m.pkg, message), REQUEST_SUFFIX)
+				fieldTypeName = suffixName(scopedDescriptorTypeName(m.pkg, message), options.requestTypeSuffix)
 
 				// If the field is a message we need to recurse
 				messageGen := messageGenerator{
@@ -118,10 +116,9 @@ func (m messageGenerator) generateResponseType(f *codegen.File) {
 	// We are generating inline, so keep track of additional messages that need to be generated and generate at the end
 	additionalMessagesToGenerate := make(map[protoreflect.FullName]messageGenerator)
 
-	typeName := suffixName(scopedDescriptorTypeName(m.pkg, m.message), RESPONSE_SUFFIX)
-	if existingType, ok := generatedMessagesRegistry[typeName]; ok {
+	typeName := suffixName(scopedDescriptorTypeName(m.pkg, m.message), options.responseTypeSuffix)
+	if _, ok := generatedMessagesRegistry[typeName]; ok {
 		// If the response type already exists, we can skip generating it.
-		log(fmt.Sprintf("skipping response type %s, already exists as %s", typeName, existingType))
 		return
 	}
 	generatedMessagesRegistry[typeName] = m.message
@@ -143,7 +140,7 @@ func (m messageGenerator) generateResponseType(f *codegen.File) {
 			messageRequiresDiscrimination := getMessageRequiresDiscrimination(message, 0, make(map[protoreflect.FullName]bool))
 
 			if messageRequiresDiscrimination {
-				fieldTypeName = suffixName(scopedDescriptorTypeName(m.pkg, message), RESPONSE_SUFFIX)
+				fieldTypeName = suffixName(scopedDescriptorTypeName(m.pkg, message), options.responseTypeSuffix)
 
 				// If the field is a message we need to recurse
 				messageGen := messageGenerator{

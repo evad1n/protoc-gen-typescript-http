@@ -59,11 +59,6 @@ func indentBy(n int) string {
 	return strings.Repeat("  ", n)
 }
 
-const (
-	REQUEST_SUFFIX  = "__Request"
-	RESPONSE_SUFFIX = "__Response"
-)
-
 // suffixName is a utility function that appends a suffix to a name if it does not already end with that suffix.
 func suffixName(name string, suffix string) string {
 	if strings.HasSuffix(name, suffix) {
