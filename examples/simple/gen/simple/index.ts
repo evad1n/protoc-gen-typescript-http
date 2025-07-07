@@ -2,19 +2,19 @@
 /* eslint-disable camelcase */
 // @ts-nocheck
 
-type wellKnownStringValue = string | null;
-
-/**
- * An empty JSON object
- */
-type wellKnownEmpty = Record<never, never>;
-
 /**
  * Encoded using RFC 3339, where generated output will always be Z-normalized
  * and uses 0, 3, 6 or 9 fractional digits.
  * Offsets other than "Z" are also accepted.
  */
 type wellKnownTimestamp = string;
+
+type wellKnownStringValue = string | null;
+
+/**
+ * An empty JSON object
+ */
+type wellKnownEmpty = Record<never, never>;
 
 type RequestType = {
   path: string;
@@ -23,6 +23,48 @@ type RequestType = {
 };
 
 type RequestHandler = (request: RequestType, meta: { service: string, method: string }) => Promise<unknown>;
+
+/**
+ * Request message for GetUser.
+ */
+export type GetUserRequest__Request = {
+  id: number;
+};
+
+/**
+ * Request message for CreateUser.
+ */
+export type CreateUserRequest__Request = {
+  /**
+   * Behaviors: REQUIRED
+   */
+  user: User__Request;
+};
+
+/**
+ * A simple message representing a user.
+ */
+export type User__Request = {
+  /**
+   * Behaviors: REQUIRED
+   */
+  name: string;
+  email: string;
+  /**
+   * Behaviors: OPTIONAL
+   */
+  favoriteColor?: string;
+};
+
+/**
+ * Request message for DeleteUser.
+ */
+export type DeleteUserRequest__Request = {
+  /**
+   * Behaviors: REQUIRED
+   */
+  id: number;
+};
 
 export type Element__Response = {
   /**
@@ -155,48 +197,6 @@ export type User__Response = {
    * Behaviors: OUTPUT_ONLY
    */
   createdDate: wellKnownTimestamp;
-};
-
-/**
- * Request message for GetUser.
- */
-export type GetUserRequest__Request = {
-  id: number;
-};
-
-/**
- * Request message for CreateUser.
- */
-export type CreateUserRequest__Request = {
-  /**
-   * Behaviors: REQUIRED
-   */
-  user: User__Request;
-};
-
-/**
- * A simple message representing a user.
- */
-export type User__Request = {
-  /**
-   * Behaviors: REQUIRED
-   */
-  name: string;
-  email: string;
-  /**
-   * Behaviors: OPTIONAL
-   */
-  favoriteColor?: string;
-};
-
-/**
- * Request message for DeleteUser.
- */
-export type DeleteUserRequest__Request = {
-  /**
-   * Behaviors: REQUIRED
-   */
-  id: number;
 };
 
 /**

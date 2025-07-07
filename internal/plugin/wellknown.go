@@ -10,6 +10,7 @@ const (
 	wellKnownPrefix = "google.protobuf."
 )
 
+// WellKnown represents a well-known type in the Google Protocol Buffers ecosystem. Such as google.protobuf.Timestamp.
 type WellKnown string
 
 // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf

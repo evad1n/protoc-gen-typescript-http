@@ -74,6 +74,10 @@ func (p packageGenerator) Register() {
 			inputMessageName := method.Input().FullName()
 			inputMessageEntry, ok := messageRegistry[inputMessageName]
 			if !ok {
+				// If it's a well-known type, then ignore
+				if _, ok := WellKnownType(method.Input()); ok {
+					continue
+				}
 				logV("Warning: input message", inputMessageName, "not found in registry for service", serviceDescriptor.FullName())
 			} else {
 				messageRegistry[inputMessageName] = messageEntry{
@@ -86,6 +90,10 @@ func (p packageGenerator) Register() {
 			outputMessageName := method.Output().FullName()
 			outputMessageEntry, ok := messageRegistry[outputMessageName]
 			if !ok {
+				// If it's a well-known type, then ignore
+				if _, ok := WellKnownType(method.Input()); ok {
+					continue
+				}
 				logV("Warning: output message", outputMessageName, "not found in registry for service", serviceDescriptor.FullName())
 			} else {
 				messageRegistry[outputMessageName] = messageEntry{
