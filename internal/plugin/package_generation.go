@@ -20,7 +20,7 @@ var (
 	messageRegistry       = make(map[protoreflect.FullName]messageEntry)
 	serviceRegistry       = make(map[protoreflect.ServiceDescriptor]serviceEntry)
 	enumRegistry          = make(map[protoreflect.EnumDescriptor]protoreflect.EnumDescriptor)
-	wellKnownTypeRegistry = make(map[WellKnown]WellKnown)
+	wellKnownTypeRegistry = make(map[WellKnownType]WellKnownType)
 )
 
 type packageGenerator struct {
@@ -39,7 +39,7 @@ func (p packageGenerator) Generate(f *codegen.File) error {
 
 func (p packageGenerator) Register() {
 	protowalk.WalkFiles(p.files, func(desc protoreflect.Descriptor) bool {
-		if wkt, ok := WellKnownType(desc); ok {
+		if wkt, ok := GetWellKnownType(desc); ok {
 			wellKnownTypeRegistry[wkt] = wkt
 			return false
 		}
@@ -75,7 +75,7 @@ func (p packageGenerator) Register() {
 			inputMessageEntry, ok := messageRegistry[inputMessageName]
 			if !ok {
 				// If it's a well-known type, then ignore
-				if _, ok := WellKnownType(method.Input()); ok {
+				if _, ok := GetWellKnownType(method.Input()); ok {
 					continue
 				}
 				logV("Warning: input message", inputMessageName, "not found in registry for service", serviceDescriptor.FullName())
@@ -91,7 +91,7 @@ func (p packageGenerator) Register() {
 			outputMessageEntry, ok := messageRegistry[outputMessageName]
 			if !ok {
 				// If it's a well-known type, then ignore
-				if _, ok := WellKnownType(method.Input()); ok {
+				if _, ok := GetWellKnownType(method.Input()); ok {
 					continue
 				}
 				logV("Warning: output message", outputMessageName, "not found in registry for service", serviceDescriptor.FullName())

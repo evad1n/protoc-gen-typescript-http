@@ -10,33 +10,33 @@ const (
 	wellKnownPrefix = "google.protobuf."
 )
 
-// WellKnown represents a well-known type in the Google Protocol Buffers ecosystem. Such as google.protobuf.Timestamp.
-type WellKnown string
+// WellKnownType represents a well-known type in the Google Protocol Buffers ecosystem. Such as google.protobuf.Timestamp.
+type WellKnownType string
 
 // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf
 const (
-	WellKnownAny       WellKnown = "google.protobuf.Any"
-	WellKnownDuration  WellKnown = "google.protobuf.Duration"
-	WellKnownEmpty     WellKnown = "google.protobuf.Empty"
-	WellKnownFieldMask WellKnown = "google.protobuf.FieldMask"
-	WellKnownStruct    WellKnown = "google.protobuf.Struct"
-	WellKnownTimestamp WellKnown = "google.protobuf.Timestamp"
+	WellKnownAny       WellKnownType = "google.protobuf.Any"
+	WellKnownDuration  WellKnownType = "google.protobuf.Duration"
+	WellKnownEmpty     WellKnownType = "google.protobuf.Empty"
+	WellKnownFieldMask WellKnownType = "google.protobuf.FieldMask"
+	WellKnownStruct    WellKnownType = "google.protobuf.Struct"
+	WellKnownTimestamp WellKnownType = "google.protobuf.Timestamp"
 
 	// Wrapper types.
-	WellKnownFloatValue  WellKnown = "google.protobuf.FloatValue"
-	WellKnownInt64Value  WellKnown = "google.protobuf.Int64Value"
-	WellKnownInt32Value  WellKnown = "google.protobuf.Int32Value"
-	WellKnownUInt64Value WellKnown = "google.protobuf.UInt64Value"
-	WellKnownUInt32Value WellKnown = "google.protobuf.UInt32Value"
-	WellKnownBytesValue  WellKnown = "google.protobuf.BytesValue"
-	WellKnownDoubleValue WellKnown = "google.protobuf.DoubleValue"
-	WellKnownBoolValue   WellKnown = "google.protobuf.BoolValue"
-	WellKnownStringValue WellKnown = "google.protobuf.StringValue"
+	WellKnownFloatValue  WellKnownType = "google.protobuf.FloatValue"
+	WellKnownInt64Value  WellKnownType = "google.protobuf.Int64Value"
+	WellKnownInt32Value  WellKnownType = "google.protobuf.Int32Value"
+	WellKnownUInt64Value WellKnownType = "google.protobuf.UInt64Value"
+	WellKnownUInt32Value WellKnownType = "google.protobuf.UInt32Value"
+	WellKnownBytesValue  WellKnownType = "google.protobuf.BytesValue"
+	WellKnownDoubleValue WellKnownType = "google.protobuf.DoubleValue"
+	WellKnownBoolValue   WellKnownType = "google.protobuf.BoolValue"
+	WellKnownStringValue WellKnownType = "google.protobuf.StringValue"
 
 	// Descriptor types.
-	WellKnownValue     WellKnown = "google.protobuf.Value"
-	WellKnownNullValue WellKnown = "google.protobuf.NullValue"
-	WellKnownListValue WellKnown = "google.protobuf.ListValue"
+	WellKnownValue     WellKnownType = "google.protobuf.Value"
+	WellKnownNullValue WellKnownType = "google.protobuf.NullValue"
+	WellKnownListValue WellKnownType = "google.protobuf.ListValue"
 )
 
 func IsWellKnownType(desc protoreflect.Descriptor) bool {
@@ -48,18 +48,18 @@ func IsWellKnownType(desc protoreflect.Descriptor) bool {
 	}
 }
 
-func WellKnownType(desc protoreflect.Descriptor) (WellKnown, bool) {
+func GetWellKnownType(desc protoreflect.Descriptor) (WellKnownType, bool) {
 	if !IsWellKnownType(desc) {
 		return "", false
 	}
-	return WellKnown(desc.FullName()), true
+	return WellKnownType(desc.FullName()), true
 }
 
-func (wkt WellKnown) Name() string {
+func (wkt WellKnownType) Name() string {
 	return "wellKnown" + strings.TrimPrefix(string(wkt), wellKnownPrefix)
 }
 
-func (wkt WellKnown) TypeDeclaration() string {
+func (wkt WellKnownType) TypeDeclaration() string {
 	var w writer
 	switch wkt {
 	case WellKnownAny:
