@@ -74,7 +74,7 @@ func (p packageGenerator) Register() {
 			inputMessageName := method.Input().FullName()
 			inputMessageEntry, ok := messageRegistry[inputMessageName]
 			if !ok {
-				log("Warning: input message", inputMessageName, "not found in registry for service", serviceDescriptor.FullName())
+				logV("Warning: input message", inputMessageName, "not found in registry for service", serviceDescriptor.FullName())
 			} else {
 				messageRegistry[inputMessageName] = messageEntry{
 					message:        inputMessageEntry.message,
@@ -86,7 +86,7 @@ func (p packageGenerator) Register() {
 			outputMessageName := method.Output().FullName()
 			outputMessageEntry, ok := messageRegistry[outputMessageName]
 			if !ok {
-				log("Warning: output message", outputMessageName, "not found in registry for service", serviceDescriptor.FullName())
+				logV("Warning: output message", outputMessageName, "not found in registry for service", serviceDescriptor.FullName())
 			} else {
 				messageRegistry[outputMessageName] = messageEntry{
 					message:        outputMessageEntry.message,

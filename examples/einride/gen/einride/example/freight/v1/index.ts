@@ -3,13 +3,6 @@
 // @ts-nocheck
 
 /**
- * Encoded using RFC 3339, where generated output will always be Z-normalized
- * and uses 0, 3, 6 or 9 fractional digits.
- * Offsets other than "Z" are also accepted.
- */
-type wellKnownTimestamp = string;
-
-/**
  * In JSON, a field mask is encoded as a single string where paths are
  * separated by a comma. Fields name in each path are converted
  * to/from lower-camel naming conventions.
@@ -39,6 +32,13 @@ type wellKnownTimestamp = string;
  */
 type wellKnownFieldMask = string;
 
+/**
+ * Encoded using RFC 3339, where generated output will always be Z-normalized
+ * and uses 0, 3, 6 or 9 fractional digits.
+ * Offsets other than "Z" are also accepted.
+ */
+type wellKnownTimestamp = string;
+
 type RequestType = {
   path: string;
   method: string;
@@ -46,6 +46,126 @@ type RequestType = {
 };
 
 type RequestHandler = (request: RequestType, meta: { service: string, method: string }) => Promise<unknown>;
+
+/**
+ * Request message for FreightService.UpdateShipper.
+ */
+export type UpdateShipperRequest__Request = {
+  /**
+   * The shipper to update with. The name must match or be empty.
+   * The shipper's `name` field is used to identify the shipper to be updated.
+   * Format: shippers/{shipper}
+   * 
+   * Behaviors: REQUIRED
+   */
+  shipper: Shipper;
+  /**
+   * The list of fields to be updated.
+   */
+  updateMask: wellKnownFieldMask;
+};
+
+/**
+ * Request message for FreightService.DeleteShipper.
+ */
+export type DeleteShipperRequest__Request = {
+  /**
+   * The resource name of the shipper to delete.
+   * Format: shippers/{shipper}
+   * 
+   * Behaviors: REQUIRED
+   */
+  name: string;
+};
+
+/**
+ * Response message for FreightService.ListShipments.
+ */
+export type ListShipmentsResponse__Response = {
+  /**
+   * The list of shipments.
+   */
+  shipments: Shipment[];
+  /**
+   * A token to retrieve next page of results.  Pass this value in the
+   * [ListShipmentsRequest.page_token][einride.example.freight.v1.ListShipmentsRequest.page_token]
+   * field in the subsequent call to `ListShipments` method to retrieve the next
+   * page of results.
+   */
+  nextPageToken: string;
+};
+
+/**
+ * Request message for FreightService.DeleteShipment.
+ */
+export type DeleteShipmentRequest__Request = {
+  /**
+   * The resource name of the shipment to delete.
+   * Format: shippers/{shipper}/shipments/{shipment}
+   * 
+   * Behaviors: REQUIRED
+   */
+  name: string;
+};
+
+/**
+ * Response message for FreightService.ListShippers.
+ */
+export type ListShippersResponse__Response = {
+  /**
+   * The list of shippers.
+   */
+  shippers: Shipper[];
+  /**
+   * A token to retrieve next page of results.  Pass this value in the
+   * [ListShippersRequest.page_token][einride.example.freight.v1.ListShippersRequest.page_token]
+   * field in the subsequent call to `ListShippers` method to retrieve the next
+   * page of results.
+   */
+  nextPageToken: string;
+};
+
+/**
+ * Request message for FreightService.ListSites.
+ */
+export type ListSitesRequest__Request = {
+  /**
+   * The resource name of the parent, which owns this collection of sites.
+   * Format: shippers/{shipper}
+   * 
+   * Behaviors: REQUIRED
+   */
+  parent: string;
+  /**
+   * Requested page size. Server may return fewer sites than requested.
+   * If unspecified, server will pick an appropriate default.
+   */
+  pageSize: number;
+  /**
+   * A token identifying a page of results the server should return.
+   * Typically, this is the value of
+   * [ListSitesResponse.next_page_token][einride.example.freight.v1.ListSitesResponse.next_page_token]
+   * returned from the previous call to `ListSites` method.
+   */
+  pageToken: string;
+};
+
+/**
+ * Response message for FreightService.ListSites.
+ */
+export type ListSitesResponse__Response = {
+  /**
+   * The list of sites.
+   */
+  sites: Site[];
+  /**
+   * A token to retrieve next page of results.  Pass this value in the
+   * [ListSitesRequest.page_token][einride.example.freight.v1.ListSitesRequest.page_token]
+   * field in the subsequent call to `ListSites` method to retrieve the next
+   * page of results.
+   */
+  nextPageToken: string;
+};
 
 /**
  * An object that represents a latitude/longitude pair. This is expressed as a
@@ -66,30 +186,12 @@ export type googletype_LatLng = {
 };
 
 /**
- * Request message for FreightService.ListShippers.
+ * Request message for FreightService.GetSite.
  */
-export type ListShippersRequest__Request = {
+export type GetSiteRequest__Request = {
   /**
-   * Requested page size. Server may return fewer shippers than requested.
-   * If unspecified, server will pick an appropriate default.
-   */
-  pageSize: number;
-  /**
-   * A token identifying a page of results the server should return.
-   * Typically, this is the value of
-   * [ListShippersResponse.next_page_token][einride.example.freight.v1.ListShippersResponse.next_page_token]
-   * returned from the previous call to `ListShippers` method.
-   */
-  pageToken: string;
-};
-
-/**
- * Request message for FreightService.DeleteShipper.
- */
-export type DeleteShipperRequest__Request = {
-  /**
-   * The resource name of the shipper to delete.
-   * Format: shippers/{shipper}
+   * The resource name of the site to retrieve.
+   * Format: shippers/{shipper}/sites/{site}
    * 
    * Behaviors: REQUIRED
    */
@@ -116,20 +218,34 @@ export type CreateSiteRequest__Request = {
 };
 
 /**
- * Response message for FreightService.ListShipments.
+ * Request message for FreightService.UpdateSite.
  */
-export type ListShipmentsResponse__Response = {
+export type UpdateSiteRequest__Request = {
   /**
-   * The list of shipments.
+   * The site to update with. The name must match or be empty.
+   * The site's `name` field is used to identify the site to be updated.
+   * Format: shippers/{shipper}/sites/{site}
+   * 
+   * Behaviors: REQUIRED
    */
-  shipments: Shipment[];
+  site: Site;
   /**
-   * A token to retrieve next page of results.  Pass this value in the
-   * [ListShipmentsRequest.page_token][einride.example.freight.v1.ListShipmentsRequest.page_token]
-   * field in the subsequent call to `ListShipments` method to retrieve the next
-   * page of results.
+   * The list of fields to be updated.
    */
-  nextPageToken: string;
+  updateMask: wellKnownFieldMask;
+};
+
+/**
+ * Request message for FreightService.DeleteSite.
+ */
+export type DeleteSiteRequest__Request = {
+  /**
+   * The resource name of the site to delete.
+   * Format: shippers/{shipper}/sites/{site}
+   * 
+   * Behaviors: REQUIRED
+   */
+  name: string;
 };
 
 /**
@@ -148,19 +264,6 @@ export type UpdateShipmentRequest__Request = {
    * The list of fields to be updated.
    */
   updateMask: wellKnownFieldMask;
-};
-
-/**
- * Request message for FreightService.DeleteShipment.
- */
-export type DeleteShipmentRequest__Request = {
-  /**
-   * The resource name of the shipment to delete.
-   * Format: shippers/{shipper}/shipments/{shipment}
-   * 
-   * Behaviors: REQUIRED
-   */
-  name: string;
 };
 
 /**
@@ -263,55 +366,24 @@ export type LineItem = {
 };
 
 /**
- * Request message for FreightService.GetShipper.
+ * Request message for FreightService.CreateShipper.
  */
-export type GetShipperRequest__Request = {
+export type CreateShipperRequest__Request = {
   /**
-   * The resource name of the shipper to retrieve.
-   * Format: shippers/{shipper}
+   * The shipper to create.
    * 
    * Behaviors: REQUIRED
    */
-  name: string;
+  shipper: Shipper;
 };
 
 /**
- * Request message for FreightService.GetSite.
+ * Request message for FreightService.GetShipment.
  */
-export type GetSiteRequest__Request = {
+export type GetShipmentRequest__Request = {
   /**
-   * The resource name of the site to retrieve.
-   * Format: shippers/{shipper}/sites/{site}
-   * 
-   * Behaviors: REQUIRED
-   */
-  name: string;
-};
-
-/**
- * Response message for FreightService.ListSites.
- */
-export type ListSitesResponse__Response = {
-  /**
-   * The list of sites.
-   */
-  sites: Site[];
-  /**
-   * A token to retrieve next page of results.  Pass this value in the
-   * [ListSitesRequest.page_token][einride.example.freight.v1.ListSitesRequest.page_token]
-   * field in the subsequent call to `ListSites` method to retrieve the next
-   * page of results.
-   */
-  nextPageToken: string;
-};
-
-/**
- * Request message for FreightService.DeleteSite.
- */
-export type DeleteSiteRequest__Request = {
-  /**
-   * The resource name of the site to delete.
-   * Format: shippers/{shipper}/sites/{site}
+   * The resource name of the shipment to retrieve.
+   * Format: shippers/{shipper}/shipments/{shipment}
    * 
    * Behaviors: REQUIRED
    */
@@ -341,6 +413,25 @@ export type ListShipmentsRequest__Request = {
    * returned from the previous call to `ListShipments` method.
    */
   pageToken: string;
+};
+
+/**
+ * Request message for FreightService.CreateShipment.
+ */
+export type CreateShipmentRequest__Request = {
+  /**
+   * The resource name of the parent shipper for which this shipment will be created.
+   * Format: shippers/{shipper}
+   * 
+   * Behaviors: REQUIRED
+   */
+  parent: string;
+  /**
+   * The shipment to create.
+   * 
+   * Behaviors: REQUIRED
+   */
+  shipment: Shipment;
 };
 
 /**
@@ -376,35 +467,6 @@ export type Shipper__Response = {
    * Behaviors: REQUIRED
    */
   displayName: string;
-};
-
-/**
- * Response message for FreightService.ListShippers.
- */
-export type ListShippersResponse__Response = {
-  /**
-   * The list of shippers.
-   */
-  shippers: Shipper[];
-  /**
-   * A token to retrieve next page of results.  Pass this value in the
-   * [ListShippersRequest.page_token][einride.example.freight.v1.ListShippersRequest.page_token]
-   * field in the subsequent call to `ListShippers` method to retrieve the next
-   * page of results.
-   */
-  nextPageToken: string;
-};
-
-/**
- * Request message for FreightService.CreateShipper.
- */
-export type CreateShipperRequest__Request = {
-  /**
-   * The shipper to create.
-   * 
-   * Behaviors: REQUIRED
-   */
-  shipper: Shipper;
 };
 
 /**
@@ -448,73 +510,12 @@ export type Site__Response = {
 };
 
 /**
- * Request message for FreightService.UpdateShipper.
+ * Request message for FreightService.GetShipper.
  */
-export type UpdateShipperRequest__Request = {
+export type GetShipperRequest__Request = {
   /**
-   * The shipper to update with. The name must match or be empty.
-   * The shipper's `name` field is used to identify the shipper to be updated.
+   * The resource name of the shipper to retrieve.
    * Format: shippers/{shipper}
-   * 
-   * Behaviors: REQUIRED
-   */
-  shipper: Shipper;
-  /**
-   * The list of fields to be updated.
-   */
-  updateMask: wellKnownFieldMask;
-};
-
-/**
- * Request message for FreightService.ListSites.
- */
-export type ListSitesRequest__Request = {
-  /**
-   * The resource name of the parent, which owns this collection of sites.
-   * Format: shippers/{shipper}
-   * 
-   * Behaviors: REQUIRED
-   */
-  parent: string;
-  /**
-   * Requested page size. Server may return fewer sites than requested.
-   * If unspecified, server will pick an appropriate default.
-   */
-  pageSize: number;
-  /**
-   * A token identifying a page of results the server should return.
-   * Typically, this is the value of
-   * [ListSitesResponse.next_page_token][einride.example.freight.v1.ListSitesResponse.next_page_token]
-   * returned from the previous call to `ListSites` method.
-   */
-  pageToken: string;
-};
-
-/**
- * Request message for FreightService.UpdateSite.
- */
-export type UpdateSiteRequest__Request = {
-  /**
-   * The site to update with. The name must match or be empty.
-   * The site's `name` field is used to identify the site to be updated.
-   * Format: shippers/{shipper}/sites/{site}
-   * 
-   * Behaviors: REQUIRED
-   */
-  site: Site;
-  /**
-   * The list of fields to be updated.
-   */
-  updateMask: wellKnownFieldMask;
-};
-
-/**
- * Request message for FreightService.GetShipment.
- */
-export type GetShipmentRequest__Request = {
-  /**
-   * The resource name of the shipment to retrieve.
-   * Format: shippers/{shipper}/shipments/{shipment}
    * 
    * Behaviors: REQUIRED
    */
@@ -522,22 +523,21 @@ export type GetShipmentRequest__Request = {
 };
 
 /**
- * Request message for FreightService.CreateShipment.
+ * Request message for FreightService.ListShippers.
  */
-export type CreateShipmentRequest__Request = {
+export type ListShippersRequest__Request = {
   /**
-   * The resource name of the parent shipper for which this shipment will be created.
-   * Format: shippers/{shipper}
-   * 
-   * Behaviors: REQUIRED
+   * Requested page size. Server may return fewer shippers than requested.
+   * If unspecified, server will pick an appropriate default.
    */
-  parent: string;
+  pageSize: number;
   /**
-   * The shipment to create.
-   * 
-   * Behaviors: REQUIRED
+   * A token identifying a page of results the server should return.
+   * Typically, this is the value of
+   * [ListShippersResponse.next_page_token][einride.example.freight.v1.ListShippersResponse.next_page_token]
+   * returned from the previous call to `ListShippers` method.
    */
-  shipment: Shipment;
+  pageToken: string;
 };
 
 /**

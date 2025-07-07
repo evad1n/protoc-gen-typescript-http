@@ -53,7 +53,7 @@ func (m messageGenerator) generateDefaultType(f *codegen.File) {
 func (m messageGenerator) generateRequestType(f *codegen.File) {
 	commentGenerator{descriptor: m.message}.generateLeading(f, 0)
 
-	// We are generating inline, so keep track of addintional messages that need to be generated and generate at the end
+	// We are generating inline, so keep track of additional messages that need to be generated and generate at the end
 	additionalMessagesToGenerate := make(map[protoreflect.FullName]messageGenerator)
 
 	typeName := suffixName(scopedDescriptorTypeName(m.pkg, m.message), REQUEST_SUFFIX)
@@ -115,7 +115,7 @@ func (m messageGenerator) generateRequestType(f *codegen.File) {
 func (m messageGenerator) generateResponseType(f *codegen.File) {
 	commentGenerator{descriptor: m.message}.generateLeading(f, 0)
 
-	// We are generating inline, so keep track of addintional messages that need to be generated and generate at the end
+	// We are generating inline, so keep track of additional messages that need to be generated and generate at the end
 	additionalMessagesToGenerate := make(map[protoreflect.FullName]messageGenerator)
 
 	typeName := suffixName(scopedDescriptorTypeName(m.pkg, m.message), RESPONSE_SUFFIX)

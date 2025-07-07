@@ -2,32 +2,6 @@
 /* eslint-disable camelcase */
 // @ts-nocheck
 
-type wellKnownDoubleValue = number | null;
-
-type wellKnownFloatValue = number | null;
-
-/**
- * Generated output always contains 0, 3, 6, or 9 fractional digits,
- * depending on required precision, followed by the suffix "s".
- * Accepted are any fractional digits (also none) as long as they fit
- * into nano-seconds precision and the suffix "s" is required.
- */
-type wellKnownDuration = string;
-
-type wellKnownBoolValue = boolean | null;
-
-type wellKnownBytesValue = string | null;
-
-type wellKnownUInt32Value = number | null;
-
-type wellKnownUInt64Value = number | null;
-
-type wellKnownListValue = wellKnownValue[];
-
-type wellKnownInt64Value = number | null;
-
-type wellKnownStringValue = string | null;
-
 /**
  * In JSON, a field mask is encoded as a single string where paths are
  * separated by a comma. Fields name in each path are converted
@@ -58,11 +32,11 @@ type wellKnownStringValue = string | null;
  */
 type wellKnownFieldMask = string;
 
-type wellKnownValue = unknown;
-
 type wellKnownNullValue = null;
 
-type wellKnownInt32Value = number | null;
+type wellKnownDoubleValue = number | null;
+
+type wellKnownFloatValue = number | null;
 
 /**
  * If the Any contains a value that has a special JSON mapping,
@@ -76,15 +50,41 @@ interface wellKnownAny {
   [key: string]: unknown;
 }
 
-/**
- * An empty JSON object
- */
-type wellKnownEmpty = Record<never, never>;
+type wellKnownValue = unknown;
+
+type wellKnownBoolValue = boolean | null;
+
+type wellKnownBytesValue = string | null;
+
+type wellKnownInt32Value = number | null;
+
+type wellKnownUInt32Value = number | null;
+
+type wellKnownUInt64Value = number | null;
 
 /**
  * Any JSON value.
  */
 type wellKnownStruct = Record<string, unknown>;
+
+type wellKnownStringValue = string | null;
+
+type wellKnownInt64Value = number | null;
+
+/**
+ * Generated output always contains 0, 3, 6, or 9 fractional digits,
+ * depending on required precision, followed by the suffix "s".
+ * Accepted are any fractional digits (also none) as long as they fit
+ * into nano-seconds precision and the suffix "s" is required.
+ */
+type wellKnownDuration = string;
+
+/**
+ * An empty JSON object
+ */
+type wellKnownEmpty = Record<never, never>;
+
+type wellKnownListValue = wellKnownValue[];
 
 /**
  * Enum

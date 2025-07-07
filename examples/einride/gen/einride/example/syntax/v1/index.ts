@@ -2,6 +2,47 @@
 /* eslint-disable camelcase */
 // @ts-nocheck
 
+type wellKnownInt64Value = number | null;
+
+type wellKnownListValue = wellKnownValue[];
+
+type wellKnownBoolValue = boolean | null;
+
+type wellKnownFloatValue = number | null;
+
+/**
+ * Generated output always contains 0, 3, 6, or 9 fractional digits,
+ * depending on required precision, followed by the suffix "s".
+ * Accepted are any fractional digits (also none) as long as they fit
+ * into nano-seconds precision and the suffix "s" is required.
+ */
+type wellKnownDuration = string;
+
+/**
+ * An empty JSON object
+ */
+type wellKnownEmpty = Record<never, never>;
+
+type wellKnownValue = unknown;
+
+type wellKnownDoubleValue = number | null;
+
+type wellKnownUInt32Value = number | null;
+
+type wellKnownStringValue = string | null;
+
+/**
+ * If the Any contains a value that has a special JSON mapping,
+ * it will be converted as follows:
+ * {"@type": xxx, "value": yyy}.
+ * Otherwise, the value will be converted into a JSON object,
+ * and the "@type" field will be inserted to indicate the actual data type.
+ */
+interface wellKnownAny {
+  "@type": string;
+  [key: string]: unknown;
+}
+
 /**
  * In JSON, a field mask is encoded as a single string where paths are
  * separated by a comma. Fields name in each path are converted
@@ -32,59 +73,18 @@
  */
 type wellKnownFieldMask = string;
 
-type wellKnownUInt32Value = number | null;
-
-/**
- * Generated output always contains 0, 3, 6, or 9 fractional digits,
- * depending on required precision, followed by the suffix "s".
- * Accepted are any fractional digits (also none) as long as they fit
- * into nano-seconds precision and the suffix "s" is required.
- */
-type wellKnownDuration = string;
-
-type wellKnownFloatValue = number | null;
-
-/**
- * An empty JSON object
- */
-type wellKnownEmpty = Record<never, never>;
-
 /**
  * Any JSON value.
  */
 type wellKnownStruct = Record<string, unknown>;
 
-type wellKnownValue = unknown;
-
 type wellKnownNullValue = null;
 
-type wellKnownBoolValue = boolean | null;
-
-type wellKnownDoubleValue = number | null;
-
 type wellKnownInt32Value = number | null;
-
-type wellKnownInt64Value = number | null;
-
-/**
- * If the Any contains a value that has a special JSON mapping,
- * it will be converted as follows:
- * {"@type": xxx, "value": yyy}.
- * Otherwise, the value will be converted into a JSON object,
- * and the "@type" field will be inserted to indicate the actual data type.
- */
-interface wellKnownAny {
-  "@type": string;
-  [key: string]: unknown;
-}
-
-type wellKnownListValue = wellKnownValue[];
 
 type wellKnownBytesValue = string | null;
 
 type wellKnownUInt64Value = number | null;
-
-type wellKnownStringValue = string | null;
 
 /**
  * Enum
@@ -118,16 +118,6 @@ type RequestType = {
 };
 
 type RequestHandler = (request: RequestType, meta: { service: string, method: string }) => Promise<unknown>;
-
-export type Request__Request = {
-  string: string;
-  repeatedString: string[];
-  nested: Request_Nested;
-};
-
-export type Request_Nested = {
-  string: string;
-};
 
 /**
  * Message
@@ -506,6 +496,16 @@ export type Message_NestedMessage = {
   /**
    * nested_message.string
    */
+  string: string;
+};
+
+export type Request__Request = {
+  string: string;
+  repeatedString: string[];
+  nested: Request_Nested;
+};
+
+export type Request_Nested = {
   string: string;
 };
 
