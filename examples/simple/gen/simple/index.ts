@@ -25,99 +25,6 @@ type RequestType = {
 type RequestHandler = (request: RequestType, meta: { service: string, method: string }) => Promise<unknown>;
 
 /**
- * Request message for CreateUser.
- */
-export type CreateUserRequest = {
-  /**
-   * Behaviors: REQUIRED
-   */
-  user: UserRequest;
-};
-
-/**
- * A simple message representing a user.
- */
-export type UserRequest = {
-  /**
-   * Behaviors: REQUIRED
-   */
-  name: string;
-  email: string;
-  /**
-   * Behaviors: OPTIONAL
-   */
-  favoriteColor?: string;
-};
-
-/**
- * Request message for DeleteUser.
- */
-export type DeleteUserRequest = {
-  /**
-   * Behaviors: REQUIRED
-   */
-  id: number;
-};
-
-export type ElementResponse = {
-  /**
-   * The rsource name of the element.
-   * Format: orgs/{org}/elements/{element}
-   * 
-   * Behaviors: IDENTIFIER
-   */
-  name: string;
-  /**
-   * The human-readable title of the element.
-   * 
-   * Behaviors: REQUIRED
-   */
-  title: string;
-  /**
-   * the input element_ids that input to this node
-   * 
-   * Behaviors: REQUIRED
-   */
-  inputs: string[];
-  /**
-   * whether the element referenced by input[i] is from a discard list
-   * 
-   * Behaviors: OUTPUT_ONLY
-   */
-  inputIsDiscard: boolean[];
-  /**
-   * The labels of the element.
-   * 
-   * Behaviors: OUTPUT_ONLY
-   */
-  labels: string[];
-  /**
-   * The created date of the element.
-   * 
-   * Behaviors: OUTPUT_ONLY
-   */
-  createTime: wellKnownTimestamp;
-  /**
-   * The last edited date of the element.
-   * 
-   * Behaviors: OUTPUT_ONLY
-   */
-  updateTime: wellKnownTimestamp;
-  /**
-   * element's description field.
-   * 
-   * Behaviors: OPTIONAL
-   */
-  description: wellKnownStringValue;
-  /**
-   * the pipeline canvas sid this element belongs to
-   * 
-   * Behaviors: OUTPUT_ONLY
-   */
-  pipelineCanvasSid: number;
-};
-
-/**
  * Request message for creating an element
  */
 export type CreateElementRequest = {
@@ -132,7 +39,7 @@ export type CreateElementRequest = {
    * 
    * Behaviors: REQUIRED
    */
-  element: ElementRequest;
+  element: Element;
   /**
    * The ID to use for the element
    * 
@@ -141,7 +48,7 @@ export type CreateElementRequest = {
   elementId?: string;
 };
 
-export type ElementRequest = {
+export type Element = {
   /**
    * The rsource name of the element.
    * Format: orgs/{org}/elements/{element}
@@ -172,7 +79,7 @@ export type ElementRequest = {
 /**
  * A simple message representing a user.
  */
-export type UserResponse = {
+export type User = {
   /**
    * Behaviors: OUTPUT_ONLY
    */
@@ -200,13 +107,36 @@ export type GetUserRequest = {
 };
 
 /**
+ * Request message for CreateUser.
+ */
+export type CreateUserRequest = {
+  /**
+   * Behaviors: REQUIRED
+   */
+  user: User;
+};
+
+/**
+ * A simple message representing a user.
+ */
+/**
+ * Request message for DeleteUser.
+ */
+export type DeleteUserRequest = {
+  /**
+   * Behaviors: REQUIRED
+   */
+  id: number;
+};
+
+/**
  * ElementService provides methods for managing pipeline elements
  */
 export interface ElementService {
   /**
    * CreateElement creates a new pipeline element
    */
-  CreateElement(request: CreateElementRequest): Promise<ElementResponse>;
+  CreateElement(request: CreateElementRequest): Promise<Element>;
 }
 
 export function createElementServiceClient(
@@ -245,11 +175,11 @@ export interface UserService {
   /**
    * Gets a user by ID.
    */
-  GetUser(request: GetUserRequest): Promise<UserResponse>;
+  GetUser(request: GetUserRequest): Promise<User>;
   /**
    * Creates a new user.
    */
-  CreateUser(request: CreateUserRequest): Promise<UserResponse>;
+  CreateUser(request: CreateUserRequest): Promise<User>;
   DeleteUser(request: DeleteUserRequest): Promise<wellKnownEmpty>;
 }
 
