@@ -1,3 +1,5 @@
+Forked from https://github.com/einride/protoc-gen-typescript-http
+
 # protoc-gen-typescript-http
 
 Generates Typescript types and service clients from protobuf definitions
