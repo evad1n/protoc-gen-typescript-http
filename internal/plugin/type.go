@@ -1,6 +1,9 @@
 package plugin
 
-import "google.golang.org/protobuf/reflect/protoreflect"
+import (
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
+)
 
 type Type struct {
 	IsNamed bool
@@ -42,6 +45,17 @@ func typeFromField(pkg protoreflect.FullName, field protoreflect.FieldDescriptor
 }
 
 func namedTypeFromField(pkg protoreflect.FullName, field protoreflect.FieldDescriptor) Type {
+
+	// Check if jstype is set to JS_STRING
+	opts, ok := field.Options().(*descriptorpb.FieldOptions)
+	var jstype descriptorpb.FieldOptions_JSType
+	if ok && opts != nil && opts.Jstype != nil {
+		jstype = opts.GetJstype()
+		if jstype == descriptorpb.FieldOptions_JS_STRING {
+			return Type{IsNamed: true, Name: "string"}
+		}
+	}
+
 	switch field.Kind() {
 	case protoreflect.StringKind, protoreflect.BytesKind:
 		return Type{IsNamed: true, Name: "string"}

@@ -44,7 +44,7 @@ message Element {
   google.protobuf.StringValue description = 10 [(google.api.field_behavior) = OPTIONAL];
 
   // the pipeline canvas sid this element belongs to
-  int64 pipeline_canvas_sid = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+  int64 pipeline_canvas_sid = 11 [(google.api.field_behavior) = OUTPUT_ONLY, jstype = JS_STRING];
 }
 
 // Request message for creating an element
